@@ -6,7 +6,7 @@ class MantleLayer(Layer):
     def __init__(self, inner_radius, outer_radius, params=None):
         Layer.__init__(self, inner_radius, outer_radius, params)
 
-class Mantle_Stevenson(MantleLayer):
+class Stevenson(MantleLayer):
     def __init__(self, params=None):
         if params is None:
             params = Parameters('Stevenson 1983 for mantle')
@@ -165,7 +165,7 @@ class Mantle_Stevenson(MantleLayer):
         dTdt = (internal_heat_energy - net_flux_out) / effective_heat_capacity
         return dTdt
 
-class Mantle_Stevenson_backwards(Mantle_Stevenson):
+class Stevenson_backwards(Stevenson):
     def __init__(self, params=None):
         Stevenson.__init__(self, params)
 
@@ -176,10 +176,10 @@ class Mantle_Stevenson_backwards(Mantle_Stevenson):
         pm = self.params.mantle
         return pm.Q_0 * np.exp(-pm.lam * (pm.time_end-time))
 
-class Mantle_Driscoll(MantleLayer):
+class Driscoll(MantleLayer):
     pass
 
-class Mantle_Korenaga2005(MantleLayer):
+class Korenaga2005(MantleLayer):
     def __init__(self):
         def __init__(self, params=None):
             if params is None:
@@ -326,7 +326,7 @@ class Mantle_Korenaga2005(MantleLayer):
     def energy_balance(self, time, T_mantle, ):
         pass
 
-class Mantle_ORourke2016(MantleLayer):
+class ORourke2016(MantleLayer):
     def __init__(self, params=None):
         if params is None:
             params = Parameters('ORourke 2016 for mantle')
@@ -357,7 +357,7 @@ class Mantle_ORourke2016(MantleLayer):
     def energy_balance(self, T_M, T_B, T_U):
         pass
 
-class Mantle_Custom(Mantle_Stevenson):
+class Custom(Stevenson):
     def __init__(self, params=None):
         Stevenson.__init__(self, params=params)
         pm = self.params.mantle

@@ -6,20 +6,6 @@ class Parameters(object):
     def __init__(self, source):
         self.source = source
 
-class Planet(object):
-    def __init__(self, layers, params):
-        self.layers = layers
-        self.Nlayers = len(layers)
-
-        self.radius = self.layers[-1].outer_radius
-        self.volume = 4. / 3. * np.pi * self.radius ** 3
-        for layer in self.layers:
-            layer.planet = self
-        self.params = params
-
-    def integrate(self, x0, xkey=None):
-        raise NotImplementedError('must implement an integrate method')
-
 class Layer(object):
     '''
     The layer base class defines the geometry of a spherical shell within

@@ -1,11 +1,13 @@
 import numpy as np
+from numpy import pi, exp
+import scipy.special as spec
 from .base import Parameters, Layer
 
 class CoreLayer(Layer):
     def __init__(self, inner_radius=0., outer_radius=3480e3, params={}):
         Layer.__init__(self, inner_radius, outer_radius, params)
 
-class Core_Stevenson(CoreLayer):
+class Stevenson(CoreLayer):
     def __init__(self, params=None, case=1):
         if params is None:
             params = Parameters('Stevenson 1983 for core')
@@ -155,11 +157,11 @@ class Core_Stevenson(CoreLayer):
         dTdt = -core_flux * core_surface_area / (effective_heat_capacity - latent_heat)
         return dTdt
 
-class Core_Stevenson_backwards(Core_Stevenson):
+class Stevenson_backwards(Stevenson):
     def __init__(self, params=None, case=1):
         Stevenson.__init__(self, params=params, case=case)
         
-class Core_Labrosse(CoreLayer):
+class Labrosse(CoreLayer):
     def __init__(self, params=None, T_cmb0 = None):
         if params is None:
             params = Parameters('Labrosse 2015 Core')
@@ -306,7 +308,7 @@ class Core_Labrosse(CoreLayer):
         r_ic = opt.brentq(opt_function, 0, pc.r_oc)
         return r_ic
 
-class Core_Nimmo(CoreLayer):
+class Nimmo(CoreLayer):
     def __init__(self, params=None):
         if params is None:
             params = Parameters('Parent to Nimmo')
@@ -1145,7 +1147,7 @@ class Core_Nimmo(CoreLayer):
         dT_cmb_dt = (Q_cmb - Q_R) / Qt_T
         return dT_cmb_dt
 
-class Core_Custom(Core_Nimmo):
+class Custom(Nimmo):
     def __init__(self, params=None):
         Nimmo.__init__(self, params)
         pc = self.params.core
@@ -1253,7 +1255,7 @@ class Core_Custom(Core_Nimmo):
             if self.current_values.dKs_dT is not None and not recompute:
                 dKs_dT = self.current_values.dKs_dT
             else:
-                dKs_dT = self.planet.reactions.compute_dKs_dT(T_cmb, Moles)
+                dKs_dT = self.planet.reactions.dKs_dT(T_cmb, Moles)
                 if store_computed:
                     self.current_values.dKs_dT = dKs_dT
 
@@ -1265,13 +1267,9 @@ class Core_Custom(Core_Nimmo):
                 # if store_computed:
                     # self.current_values.dMoles_dT = dMoles_dT
 
-            # compute C_m dependent on solubility of X_Mg compared to current X_Mg
-            # 0 if X_Mg_sol > X_Mg, convert to wt% MgO if X_Mg_sol < X_Mg
-            _,_,[C_m, C_s, C_f] = self.planet.reactions.dMoles2wtp(dMoles=dMoles_dT, Moles=Moles, calculate_Cs=True)
+            C_m = self.planet.reactions.C_m(dMoles_dT, Moles)
             if store_computed:
                 self.current_values.C_m = C_m
-                self.current_values.C_s = C_s
-                self.current_values.C_f = C_f
             return C_m
 
     def C_s(self, T_cmb, Moles, recompute=False, store_computed=True):
@@ -1292,7 +1290,7 @@ class Core_Custom(Core_Nimmo):
             if self.current_values.dKs_dT is not None and not recompute:
                 dKs_dT = self.current_values.dKs_dT
             else:
-                dKs_dT = self.planet.reactions.compute_dKs_dT(T_cmb, Moles)
+                dKs_dT = self.planet.reactions.dKs_dT(T_cmb, Moles)
                 if store_computed:
                     self.current_values.dKs_dT = dKs_dT
 
@@ -1306,11 +1304,9 @@ class Core_Custom(Core_Nimmo):
 
             # compute C_m dependent on solubility of X_Mg compared to current X_Mg
             # 0 if X_Mg_sol > X_Mg, convert to wt% MgO if X_Mg_sol < X_Mg
-            _, _, [C_m, C_s, C_f] = self.planet.reactions.Moles2wtp(dMoles=dMoles_dT, Moles=Moles, calculate_Cs=True)
+            C_s = self.planet.reactions.C_s(dMoles_dT, Moles)
             if store_computed:
-                self.current_values.C_m = C_m
                 self.current_values.C_s = C_s
-                self.current_values.C_f = C_f
             return C_s
 
     def C_f(self, T_cmb, Moles, recompute=False, store_computed=True):
@@ -1331,7 +1327,7 @@ class Core_Custom(Core_Nimmo):
             if self.current_values.dKs_dT is not None and not recompute:
                 dKs_dT = self.current_values.dKs_dT
             else:
-                dKs_dT = self.planet.reactions.compute_dKs_dT(T_cmb, Moles)
+                dKs_dT = self.planet.reactions.dKs_dT(T_cmb, Moles)
                 if store_computed:
                     self.current_values.dKs_dT = dKs_dT
 
@@ -1345,10 +1341,8 @@ class Core_Custom(Core_Nimmo):
 
             # compute C_m dependent on solubility of X_Mg compared to current X_Mg
             # 0 if X_Mg_sol > X_Mg, convert to wt% MgO if X_Mg_sol < X_Mg
-            _, _, [C_m, C_s, C_f] = self.planet.reactions.Moles2wtp(dMoles=dMoles_dT, Moles=Moles, calculate_Cs=True)
+            C_f = self.planet.reactions.C_f(dMoles_dT, Moles)
             if store_computed:
-                self.current_values.C_m = C_m
-                self.current_values.C_s = C_s
                 self.current_values.C_f = C_f
             return C_f
 

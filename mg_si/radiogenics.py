@@ -1,3 +1,5 @@
+import numpy as np
+
 class Radiogenics(object):
     def __init__(self):
         self.CGyr2s = 1e9 * 365.25 * 24 * 3600
