@@ -1238,7 +1238,7 @@ class Custom(Nimmo):
         pc = self.params.core
         return self.planet.radiogenics.heat_production_core(pc.Hp, time)/self.mass
 
-    def C_m(self, T_cmb, Moles, recompute=False, store_computed=True):
+    def C_m(self, T_cmb, Moles, recompute=False, store_computed=True, dTdt_est=-1e-14):
         '''
         constant relating MgO exsolution to CMB temperature change [wt% / K]
 
@@ -1264,7 +1264,7 @@ class Custom(Nimmo):
             if self.current_values.dMoles_dT is not None and not recompute:
                 dMoles_dT = self.current_values.dMoles_dT
             else:
-                dMoles_dT = self.planet.reactions.dMoles_dT(Moles, T_cmb, dKs_dT=dKs_dT, dTdt=1e12) #HACK for erosion
+                dMoles_dT = self.planet.reactions.dMoles_dT(Moles, T_cmb, dKs_dT=dKs_dT, dTdt=dTdt_est) #HACK for erosion
                 # if store_computed:
                     # self.current_values.dMoles_dT = dMoles_dT
 
@@ -1273,7 +1273,7 @@ class Custom(Nimmo):
                 self.current_values.C_m = C_m
             return C_m
 
-    def C_s(self, T_cmb, Moles, recompute=False, store_computed=True):
+    def C_s(self, T_cmb, Moles, recompute=False, store_computed=True, dTdt_est=-1e-14):
         '''
         constant relating SiO2 exsolution to CMB temperature change [wt% / K]
 
@@ -1299,7 +1299,7 @@ class Custom(Nimmo):
             if self.current_values.dMoles_dT is not None and not recompute:
                 dMoles_dT = self.current_values.dMoles_dT
             else:
-                dMoles_dT = self.planet.reactions.dMoles_dT(Moles, T_cmb, dKs_dT=dKs_dT, dTdt=1e12) #HACK for erosion
+                dMoles_dT = self.planet.reactions.dMoles_dT(Moles, T_cmb, dKs_dT=dKs_dT, dTdt=dTdt_est) #HACK for erosion
                 # if store_computed:
                     # self.current_values.dMoles_dT = dMoles_dT
 
@@ -1310,7 +1310,7 @@ class Custom(Nimmo):
                 self.current_values.C_s = C_s
             return C_s
 
-    def C_f(self, T_cmb, Moles, recompute=False, store_computed=True):
+    def C_f(self, T_cmb, Moles, recompute=False, store_computed=True, dTdt_est=-1e-14):
         '''
         constant relating FeO exsolution to CMB temperature change [wt% / K]
 
@@ -1336,7 +1336,7 @@ class Custom(Nimmo):
             if self.current_values.dMoles_dT is not None and not recompute:
                 dMoles_dT = self.current_values.dMoles_dT
             else:
-                dMoles_dT = self.planet.reactions.dMoles_dT(Moles, T_cmb, dKs_dT=dKs_dT, dTdt=1e12) #HACK for erosion
+                dMoles_dT = self.planet.reactions.dMoles_dT(Moles, T_cmb, dKs_dT=dKs_dT, dTdt=dTdt_est) #HACK for erosion
                 # if store_computed:
                     # self.current_values.dMoles_dT = dMoles_dT
 

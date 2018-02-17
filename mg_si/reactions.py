@@ -553,6 +553,9 @@ class MgSi():
         dM_O_dT = self.dM_O_dTc(Moles, dKs_dT, dMi_b)
         dM_Fe_dT = self.dM_Fe_dTc(Moles, dKs_dT, dMi_b)
 
+        # dM_Mg_dT = self.logit(dM_Mg_dT)
+
+
         # mantle
         dM_MgO_dT = self.dM_MgO_dTc(Moles, dKs_dT, dMi_b)
         dM_SiO2_dT = self.dM_SiO2_dTc(Moles, dKs_dT, dMi_b)
