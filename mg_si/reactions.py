@@ -385,7 +385,7 @@ class MgSi():
         dKFeSiO3_KFeSiO3 = pr.dKFeSiO3_KFeSiO3
         return dKFeSiO3_KFeSiO3
 
-    def func_KD_SiO2_val(X_Si, X_O, T_inp, P_inp_base=139e6, temp_diff_pm=10):
+    def func_KD_SiO2_val(self, X_Si, X_O, T_inp, P_inp_base=139e6, temp_diff_pm=10):
         '''
         K_D for SiO2 value
         Needs the following inputs : T_inp (Temperature in K), P_inp (Pressure in GPa),
@@ -565,7 +565,7 @@ class MgSi():
         M_Mg, M_Si, M_Fe, M_O, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m = self.unwrap_Moles(Moles)
         X_Si = M_Si/M_c
         X_O = M_O/M_c
-        K_Si,_ = self.func_KD_SiO2_val(X_Si, X_O, T_inp_base=T_cmb)
+        K_Si,_ = self.func_KD_SiO2_val(X_Si, X_O, T_inp=T_cmb)
         K_Fe, _ = self.func_KD_FeO_val(T_cmb)
         K_Mg, _ = self.func_KD_MgO_val(T_cmb)
         M_Mg_eq = K_Mg*M_MgO*M_c**2 / (M_O*M_m)
