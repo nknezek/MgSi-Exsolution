@@ -385,7 +385,7 @@ class MgSi():
         dKFeSiO3_KFeSiO3 = pr.dKFeSiO3_KFeSiO3
         return dKFeSiO3_KFeSiO3
 
-    def func_KD_SiO2_val(self, X_Si, X_O, T_inp_base, P_inp_base=139e6, temp_diff_pm=1):
+    def func_KD_SiO2_val(X_Si, X_O, T_inp, P_inp_base=139e6, temp_diff_pm=10):
         '''
         K_D for SiO2 value
         Needs the following inputs : T_inp (Temperature in K), P_inp (Pressure in GPa),
@@ -403,39 +403,13 @@ class MgSi():
         fit_KD_Si_a = 1.3  # (+/- 0.3)
         fit_KD_Si_b = -13500  # (+/- 900)
         fit_KD_Si_c = 0
-        ### Acitivity coeff fit values - Hirose et al. 2017, extended Data Table 1
-        epsf_OO = -9.16  # (+/- 4.27)
-        epsf_OSi = 7.73  # (+/- 4.53)
-        epsf_SiSi = 0
-
-        def func_KD(T_inp, X_Si=X_Si, X_O=X_O):
-            log_KD_Feo = fit_KD_FeO_a + fit_KD_FeO_b / T_inp + fit_KD_FeO_c * P_inp / T_inp
-            log_KD_Si = fit_KD_Si_a + fit_KD_Si_b / T_inp + fit_KD_Si_c * P_inp / T_inp
-
-            # Steelmaking Handbook method for correcting gamma used:
-            ##  (activity)  log(gamma(T)) = Tr/T*log(gamma(Tr))
-            T_ref = 1873  # Kelvin, Hirose 2017
-
-            #### Activity coeff values for gamma_Si (based on Hirose et al. 2017 + Ma 2001 Eqn 23-24 in the paper )
-            ## Since the cross term due to Si-Si does not contribute,
-            # so the only term that contributes for gamma_Si is the Si-O term (all the Mg related terms are zero since no data)
-            sum_v = epsf_OSi * (X_O * (1. + np.log(1. - X_O) / X_O - 1. / (1. - X_O)) - X_O ** 2. * X_Si * (
-            1. / (1. - X_Si) + 1. / (1. - X_O) + X_Si / (2. * (1. - X_Si) ** 2.) - 1.)) / 2.303
-            log_gam_Si = -(T_ref / T_inp) * (epsf_SiSi * np.log(1. - X_Si) / 2.303 + sum_v)
-            del sum_v
-            #### Activity coeff values for gamma_O (based on Hirose et al. 2017 + Ma 2001 Eqn 23-24 in the paper )
-            # Note - all the Mg related terms are zero since no data
-            sum_v = epsf_OSi * (X_Si * (1. + np.log(1. - X_Si) / X_Si - 1. / (1. - X_Si)) - X_Si ** 2. * X_O * (
-            1. / (1. - X_O) + 1. / (1. - X_Si) + X_O / (2. * (1. - X_O) ** 2.) - 1.)) / 2.303
-            log_gam_O = -(T_ref / T_inp) * (epsf_OO * np.log(1. - X_O) / 2.303 + sum_v)
-            del sum_v
-            KD_SiO2 = (10. ** log_KD_Si) * ((10. ** log_KD_Feo) ** 2.) / (10. ** (log_gam_Si)) / (10. ** (
-            log_gam_O)) ** 2.
-            return KD_SiO2
-
-        KD_SiO2 = func_KD(T_inp_base)
-        KD_SiO2_T_deriv = (func_KD(T_inp_base + temp_diff_pm) - func_KD(T_inp_base - temp_diff_pm)) / (
-        2. * temp_diff_pm)
+        log_KD_Feo = fit_KD_FeO_a + fit_KD_FeO_b / T_inp + fit_KD_FeO_c * P_inp / T_inp
+        log_KD_Si = fit_KD_Si_a + fit_KD_Si_b / T_inp + fit_KD_Si_c * P_inp / T_inp
+        KD_SiO2_p = (10. ** log_KD_Si) * ((10. ** log_KD_Feo) ** 2.)
+        emp_corr_fac = 2.  # to match the dataset from Hirose et al. 2017
+        KD_SiO2 = KD_SiO2_p * emp_corr_fac
+        KD_SiO2_T_deriv = -1. * np.log(10) * KD_SiO2 * (2. * fit_KD_FeO_c * P_inp + fit_KD_Si_b) / T_inp ** 2.
+        ### Checked this against doing the integration numerically (with a small dT)
         return KD_SiO2, KD_SiO2_T_deriv
 
     def func_KD_FeO_val(self, T_inp, P_inp_base=139e6):
