@@ -2,6 +2,7 @@ import numpy as np
 from numpy import pi, exp
 import scipy.special as spec
 from .base import Parameters, Layer
+import scipy.optimize as opt
 
 class CoreLayer(Layer):
     def __init__(self, inner_radius=0., outer_radius=3480e3, params={}):

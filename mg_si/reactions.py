@@ -219,7 +219,9 @@ class Core_MgSi(Molar_Calculations):
     def __init__(self, params=None, species=None):
         self.params = params
         if species is None:
-            species = ['Mg','Si','O','Fe']
+            species = ['Mg','Si','Fe','O']
+        self.params.reactions.core = Parameters('Core reaction parameters')
+        self.params.reactions.core.species = species
         super(Core_MgSi, self).__init__(species=species)
 
 class Mantle_MgSi(Molar_Calculations):
@@ -231,6 +233,8 @@ class Mantle_MgSi(Molar_Calculations):
         self.params = params
         if species is None:
             species = ['MgO','SiO2','FeO','MgSiO3', 'FeSiO3']
+        self.params.reactions.mantle = Parameters('mantle reaction parameters')
+        self.params.reactions.mantle.species = species
         super(Mantle_MgSi, self).__init__(species=species)
 
     def compute_Mm_b(self, fraction_MgFe, X_MgFeO, X_SiO2, M_tot=None):
@@ -295,7 +299,7 @@ class MgSi():
         :return:
         '''
         M_c,_ = self.unwrap_Moles(Moles, split_coremantle=True, return_sum=False)
-        return self.core._molmass_dict['MgO']*dMoles[0]/np.sum(self.core.M2wt(M_c))
+        return -self.core._molmass_dict['MgO']*dMoles[0]/np.sum(self.core.M2wt(M_c))
 
     def C_s(self, dMoles, Moles):
         ''' compute wt % MgO exsolved from the core given dM and M
@@ -305,7 +309,7 @@ class MgSi():
         :return:
         '''
         M_c,_ = self.unwrap_Moles(Moles, split_coremantle=True, return_sum=False)
-        return self.core._molmass_dict['SiO2'] * dMoles[1] / np.sum(self.core.M2wt(M_c))
+        return -self.core._molmass_dict['SiO2'] * dMoles[1] / np.sum(self.core.M2wt(M_c))
 
     def C_f(self, dMoles, Moles):
         ''' compute wt % MgO exsolved from the core given dM and M
@@ -315,7 +319,7 @@ class MgSi():
         :return:
         '''
         M_c,_ = self.unwrap_Moles(Moles, split_coremantle=True, return_sum=False)
-        return self.core._molmass_dict['FeO'] * dMoles[3] / np.sum(self.core.M2wt(M_c))
+        return -self.core._molmass_dict['FeO'] * dMoles[3] / np.sum(self.core.M2wt(M_c))
 
     def _set_layer_thickness(self, thickness):
         pr = self.params.reactions
@@ -480,7 +484,7 @@ class MgSi():
         M_m = np.sum(Moles[4:])
         if return_sum:
             if split_coremantle:
-                return Moles[:4], Moles[4:], M_c, M_m
+                return list(Moles[:4])+[M_c], list(Moles[4:])+[M_m]
             else:
                 return M_Mg, M_Si, M_Fe, M_O, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m
         else:
@@ -512,7 +516,7 @@ class MgSi():
         :return:
         '''
         pr = self.params.reactions
-        M_Mg, M_Si, M_O, M_Fe, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m = self.unwrap_Moles(Moles)
+        M_Mg, M_Si, M_Fe, M_O, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m = self.unwrap_Moles(Moles)
         M_MgO_b, M_SiO2_b, M_FeO_b, M_MgSiO3_b, M_FeSiO3_b = pr.Mm_b
         M_m_b = np.sum(pr.Mm_b)
         dM_MgO_dt_b = -self.erode_term(M_MgO, M_MgO_b)/dTdt
@@ -573,16 +577,7 @@ class MgSi():
         dM_Mg_dT = self.dM_Mg_dTc(Moles, dKs_dT, dMi_b)
         dM_Si_dT = self.dM_Si_dTc(Moles, dKs_dT, dMi_b)
         dM_O_dT = self.dM_O_dTc(Moles, dKs_dT, dMi_b)
-
-        ## Allow Mg, Si, O to come out of core, but not go in.
-        # M_Mg, M_Si, M_Fe, M_O, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m = self.unwrap_Moles(Moles)
-        # M_Mg_eq, M_Si_eq, M_O_eq = self.compute_Moles_eq(Moles=Moles, T_cmb=T_cmb)
-        # dM_Mg_dT = self.logit(M_Mg-M_Mg_eq)*dM_Mg_dT
-        # dM_Si_dT = self.logit(M_Si-M_Si_eq)*dM_Si_dT
-        # dM_O_dT = self.logit(M_O-M_O_eq)*dM_O_dT
-
         dM_Fe_dT = self.dM_Fe_dTc(Moles, dKs_dT, dMi_b)
-        dM_c_dT = np.sum([dM_Mg_dT, dM_Si_dT, dM_Fe_dT, dM_O_dT])
 
         # mantle
         dM_MgO_dT = self.dM_MgO_dTc(Moles, dKs_dT, dMi_b)
@@ -590,7 +585,6 @@ class MgSi():
         dM_FeO_dT = self.dM_FeO_dTc(Moles, dKs_dT, dMi_b)
         dM_MgSiO3_dT = self.dM_MgSiO3_dTc(Moles, dKs_dT, dMi_b)
         dM_FeSiO3_dT = self.dM_FeSiO3_dTc(Moles, dKs_dT, dMi_b)
-        dM_m_dT = np.sum([dM_MgO_dT, dM_FeO_dT, dM_SiO2_dT, dM_MgSiO3_dT, dM_FeSiO3_dT])
         return [dM_Mg_dT, dM_Si_dT, dM_Fe_dT, dM_O_dT, dM_MgO_dT, dM_SiO2_dT, dM_FeO_dT, dM_MgSiO3_dT, dM_FeSiO3_dT]
 
     def compute_Moles_eq(self, Moles=None, T_cmb=None):
@@ -655,7 +649,7 @@ class MgSi():
         dM_FeO_dt = dM_FeO_dT * dTc_dt
         dM_MgSiO3_dt = dM_MgSiO3_dT * dTc_dt
         dM_FeSiO3_dt = dM_FeSiO3_dT * dTc_dt
-        return [dM_Mg_dt, dM_Si_dt, dM_O_dt, dM_Fe_dt, dM_MgO_dt, dM_SiO2_dt, dM_FeO_dt, dM_MgSiO3_dt, dM_FeSiO3_dt]
+        return [dM_Mg_dt, dM_Si_dt, dM_Fe_dt, dM_O_dt, dM_MgO_dt, dM_SiO2_dt, dM_FeO_dt, dM_MgSiO3_dt, dM_FeSiO3_dt]
 
     def dM_m_dTc_dMi(self, dM_im_dTc):
         '''alternate way to compute dM_m given the results of the mole changes of all mantle components

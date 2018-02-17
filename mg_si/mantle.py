@@ -46,7 +46,7 @@ class Stevenson(MantleLayer):
         pm = self.params.mantle
         return pm.nu_0 * np.exp(pm.A / T_upper_mantle)
 
-    def find_arrenhius_params(self, nu1, T1, nu2, T2):
+    def find_arrenhius_params(self, nu1, T1, nu2, T2, set_values=True):
         '''
         given a set of two viscosities and temperatures, returns the parameters for Arrehnius visocity relation
 
@@ -61,6 +61,10 @@ class Stevenson(MantleLayer):
 
         A = np.log(nu1 / nu2) / (1 / T1 - 1 / T2)
         nu0 = nu1*np.exp(-A/T1)
+        if set_values:
+            pr = self.params.mantle
+            pr.A = A
+            pr.nu_0 = nu0
         return A, nu0
 
     def heat_production(self, time):
@@ -372,3 +376,5 @@ class Custom(Stevenson):
         '''
         pm = self.params.mantle
         return self.planet.radiogenics.heat_production_mantle(pm.Hp, time)/self.volume
+
+

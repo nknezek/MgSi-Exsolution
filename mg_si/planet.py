@@ -70,6 +70,30 @@ class Stevenson_backward(Planet):
         solution = integrate.odeint(self.ODE, x0, times, full_output=full_output)
         return solution
 
+class NimmoStevenson(Planet):
+    def __init__(self, case=1):
+        params = Parameters('Stevenson Mantle, Nimmo Core')
+        Planet.__init__(self, [mg_si.core.Nimmo(params=params), mg_si.mantle.Stevenson(params=params)], params)
+        self.core_layer = self.layers[0]
+        self.mantle_layer = self.layers[1]
+
+    def ODE(self, x, t):
+        T_cmb = x[0]
+        T_um = x[1]
+        try:
+            self.params.Mantle_verbose
+            vm = True
+        except:
+            vm = False
+        dTm_dt = self.mantle_layer.energy_balance(T_cmb, T_um, t, verbose=vm)
+        cmb_flux = self.mantle_layer.lower_boundary_flux(T_cmb, T_um)
+        dTc_dt = self.core_layer.energy_balance(t, T_cmb, cmb_flux)
+        return np.array([dTc_dt, dTm_dt])
+
+    def integrate(self, times, x0, full_output=False):
+        solution = integrate.odeint(self.ODE, x0, times, full_output=full_output)
+        return solution
+
 class Custom(Planet):
     def __init__(self, case=1):
         params = Parameters('Custom Stevenson Mantle, Custom Nimmo Core')
@@ -110,29 +134,5 @@ class Custom(Planet):
         :param full_output:
         :return:
         '''
-        solution = integrate.odeint(self.ODE, x0, times, full_output=full_output)
-        return solution
-
-class NimmoStevenson(Planet):
-    def __init__(self, case=1):
-        params = Parameters('Stevenson Mantle, Nimmo Core')
-        Planet.__init__(self, [mg_si.core.Nimmo(params=params), mg_si.mantle.Stevenson(params=params)], params)
-        self.core_layer = self.layers[0]
-        self.mantle_layer = self.layers[1]
-
-    def ODE(self, x, t):
-        T_cmb = x[0]
-        T_um = x[1]
-        try:
-            self.params.Mantle_verbose
-            vm = True
-        except:
-            vm = False
-        dTm_dt = self.mantle_layer.energy_balance(T_cmb, T_um, t, verbose=vm)
-        cmb_flux = self.mantle_layer.lower_boundary_flux(T_cmb, T_um)
-        dTc_dt = self.core_layer.energy_balance(t, T_cmb, cmb_flux)
-        return np.array([dTc_dt, dTm_dt])
-
-    def integrate(self, times, x0, full_output=False):
         solution = integrate.odeint(self.ODE, x0, times, full_output=full_output)
         return solution
