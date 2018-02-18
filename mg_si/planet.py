@@ -121,7 +121,7 @@ class Custom(Planet):
         dTm_dt = self.mantle_layer.energy_balance(T_cmb, T_um, t, verbose=vm)
         cmb_flux = self.mantle_layer.lower_boundary_flux(T_cmb, T_um)
         dTc_dt = self.core_layer.energy_balance(t, T_cmb, cmb_flux, Moles)
-        dMoles_dt  = self.reactions.dMoles_dt(Moles=Moles, T_cmb=T_cmb, dTc_dt=dTc_dt)
+        dMoles_dt  = self.reactions.dMoles_dt(Moles=Moles, T_cmb=T_cmb, dTc_dt=dTc_dt, time=t)
         dM_Mg_dt, dM_Si_dt, dM_Fe_dt, dM_O_dt, dM_c_dt, dM_MgO_dt, dM_SiO2_dt, dM_FeO_dt, dM_MgSiO3_dt, dM_FeSiO3_dt, dM_m_dt = self.reactions.unwrap_Moles(dMoles_dt)
 
         return np.array([dTc_dt, dTm_dt, dM_Mg_dt, dM_Si_dt, dM_Fe_dt, dM_O_dt, dM_MgO_dt, dM_SiO2_dt, dM_FeO_dt, dM_MgSiO3_dt, dM_FeSiO3_dt])

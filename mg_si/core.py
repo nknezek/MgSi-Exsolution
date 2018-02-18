@@ -1238,7 +1238,7 @@ class Custom(Nimmo):
         pc = self.params.core
         return self.planet.radiogenics.heat_production_core(pc.Hp, time)/self.mass
 
-    def C_m(self, T_cmb, Moles, recompute=False, store_computed=True, dTdt_est=-1e-14):
+    def C_m(self, T_cmb, Moles, recompute=False, store_computed=True, dTdt_est=-1e-14, time=None):
         '''
         constant relating MgO exsolution to CMB temperature change [wt% / K]
 
@@ -1264,7 +1264,7 @@ class Custom(Nimmo):
             if self.current_values.dMoles_dT is not None and not recompute:
                 dMoles_dT = self.current_values.dMoles_dT
             else:
-                dMoles_dT = self.planet.reactions.dMoles_dT(Moles, T_cmb, dKs_dT=dKs_dT, dTdt=dTdt_est) #HACK for erosion
+                dMoles_dT = self.planet.reactions.dMoles_dT(Moles, T_cmb, dKs_dT=dKs_dT, dTdt=dTdt_est, time=time) #HACK for erosion
                 # if store_computed:
                     # self.current_values.dMoles_dT = dMoles_dT
 
@@ -1273,7 +1273,7 @@ class Custom(Nimmo):
                 self.current_values.C_m = C_m
             return C_m
 
-    def C_s(self, T_cmb, Moles, recompute=False, store_computed=True, dTdt_est=-1e-14):
+    def C_s(self, T_cmb, Moles, recompute=False, store_computed=True, dTdt_est=-1e-14, time=None):
         '''
         constant relating SiO2 exsolution to CMB temperature change [wt% / K]
 
@@ -1299,7 +1299,7 @@ class Custom(Nimmo):
             if self.current_values.dMoles_dT is not None and not recompute:
                 dMoles_dT = self.current_values.dMoles_dT
             else:
-                dMoles_dT = self.planet.reactions.dMoles_dT(Moles, T_cmb, dKs_dT=dKs_dT, dTdt=dTdt_est) #HACK for erosion
+                dMoles_dT = self.planet.reactions.dMoles_dT(Moles, T_cmb, dKs_dT=dKs_dT, dTdt=dTdt_est, time=time) #HACK for erosion
                 # if store_computed:
                     # self.current_values.dMoles_dT = dMoles_dT
 
@@ -1310,7 +1310,7 @@ class Custom(Nimmo):
                 self.current_values.C_s = C_s
             return C_s
 
-    def C_f(self, T_cmb, Moles, recompute=False, store_computed=True, dTdt_est=-1e-14):
+    def C_f(self, T_cmb, Moles, recompute=False, store_computed=True, dTdt_est=-1e-14, time=None):
         '''
         constant relating FeO exsolution to CMB temperature change [wt% / K]
 
@@ -1336,7 +1336,7 @@ class Custom(Nimmo):
             if self.current_values.dMoles_dT is not None and not recompute:
                 dMoles_dT = self.current_values.dMoles_dT
             else:
-                dMoles_dT = self.planet.reactions.dMoles_dT(Moles, T_cmb, dKs_dT=dKs_dT, dTdt=dTdt_est) #HACK for erosion
+                dMoles_dT = self.planet.reactions.dMoles_dT(Moles, T_cmb, dKs_dT=dKs_dT, dTdt=dTdt_est, time=time) #HACK for erosion
                 # if store_computed:
                     # self.current_values.dMoles_dT = dMoles_dT
 
@@ -1347,7 +1347,7 @@ class Custom(Nimmo):
                 self.current_values.C_f = C_f
             return C_f
 
-    def Qt_gm(self, T_cmb, Moles, recompute=False, store_computed=True):
+    def Qt_gm(self, T_cmb, Moles, recompute=False, store_computed=True, time=None):
         '''
         heat production per kelvin for compositional gravitational convection from MgO exsolution
 
@@ -1363,12 +1363,12 @@ class Custom(Nimmo):
             M_oc = self.compute_mass_of_partial_core(pc.r_c, self.r_i(T_cmb))
             Qt_gm = (self.I_g(T_cmb, recompute=recompute, store_computed=store_computed)
                     - M_oc * self.phi(self.r_i(T_cmb, recompute=recompute, store_computed=store_computed))) * (
-                pc.alpha_cm * self.C_m(T_cmb, Moles, recompute=recompute, store_computed=store_computed))
+                pc.alpha_cm * self.C_m(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time))
             if store_computed:
                 self.current_values.Qt_gm = Qt_gm
             return Qt_gm
 
-    def Qt_gs(self, T_cmb, Moles, recompute=False, store_computed=True):
+    def Qt_gs(self, T_cmb, Moles, recompute=False, store_computed=True, time=None):
         '''
         heat production per kelvin for compositional gravitational convection from SiO2 exsolution
 
@@ -1384,12 +1384,12 @@ class Custom(Nimmo):
             M_oc = self.compute_mass_of_partial_core(pc.r_c, self.r_i(T_cmb))
             Qt_gs = (self.I_g(T_cmb, recompute=recompute, store_computed=store_computed)
                     - M_oc * self.phi(self.r_i(T_cmb, recompute=recompute, store_computed=store_computed))) * (
-                pc.alpha_cs * self.C_s(T_cmb, Moles, recompute=recompute, store_computed=store_computed))
+                pc.alpha_cs * self.C_s(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time))
             if store_computed:
                 self.current_values.Qt_gs = Qt_gs
             return Qt_gs
 
-    def Qt_gf(self, T_cmb, Moles, recompute=False, store_computed=True):
+    def Qt_gf(self, T_cmb, Moles, recompute=False, store_computed=True, time=None):
         '''
         heat production per kelvin for compositional gravitational convection from FeO exsolution
 
@@ -1405,12 +1405,12 @@ class Custom(Nimmo):
             M_oc = self.compute_mass_of_partial_core(pc.r_c, self.r_i(T_cmb))
             Qt_gf = (self.I_g(T_cmb, recompute=recompute, store_computed=store_computed)
                     - M_oc * self.phi(self.r_i(T_cmb, recompute=recompute, store_computed=store_computed))) * (
-                pc.alpha_cf * self.C_f(T_cmb, Moles, recompute=recompute, store_computed=store_computed))
+                pc.alpha_cf * self.C_f(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time))
             if store_computed:
                 self.current_values.Qt_gf = Qt_gf
             return Qt_gf
 
-    def Q_gm(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True):
+    def Q_gm(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True, time=None):
         '''
         heat production for compositional gravitational convection from MgO exsolution
 
@@ -1424,12 +1424,12 @@ class Custom(Nimmo):
         if self.current_values.Q_gm is not None and not recompute:
             return self.current_values.Q_gm
         else:
-            Q_gm = self.Qt_gm(T_cmb, Moles, recompute=recompute, store_computed=store_computed) * dT_cmb_dt
+            Q_gm = self.Qt_gm(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time) * dT_cmb_dt
             if store_computed:
                 self.current_values.Q_gm = Q_gm
             return Q_gm
 
-    def Q_gs(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True):
+    def Q_gs(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True, time=None):
         '''
         heat production for compositional gravitational convection from SiO2 exsolution
 
@@ -1443,12 +1443,12 @@ class Custom(Nimmo):
         if self.current_values.Q_gs is not None and not recompute:
             return self.current_values.Q_gs
         else:
-            Q_gs = self.Qt_gs(T_cmb, Moles, recompute=recompute, store_computed=store_computed) * dT_cmb_dt
+            Q_gs = self.Qt_gs(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time) * dT_cmb_dt
             if store_computed:
                 self.current_values.Q_gs = Q_gs
             return Q_gs
 
-    def Q_gf(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True):
+    def Q_gf(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True, time=None):
         '''
         heat production for compositional gravitational convection from FeO exsolution
 
@@ -1462,12 +1462,12 @@ class Custom(Nimmo):
         if self.current_values.Q_gf is not None and not recompute:
             return self.current_values.Q_gf
         else:
-            Q_gf = self.Qt_gf(T_cmb, Moles, recompute=recompute, store_computed=store_computed) * dT_cmb_dt
+            Q_gf = self.Qt_gf(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time) * dT_cmb_dt
             if store_computed:
                 self.current_values.Q_gf = Q_gf
             return Q_gf
 
-    def Et_gm(self, T_cmb, Moles, recompute=False, store_computed=True):
+    def Et_gm(self, T_cmb, Moles, recompute=False, store_computed=True, time=None):
         '''
         entropy prodution per kelvin for composition gravitational convection from Mg exsolution
 
@@ -1480,12 +1480,12 @@ class Custom(Nimmo):
         if self.current_values.Et_gm is not None and not recompute:
             return self.current_values.Et_gm
         else:
-            Et_gm = self.Qt_gm(T_cmb, Moles, recompute=recompute, store_computed=store_computed) / T_cmb
+            Et_gm = self.Qt_gm(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time) / T_cmb
             if store_computed:
                 self.current_values.Et_gm = Et_gm
             return Et_gm
 
-    def Et_gs(self, T_cmb, Moles, recompute=False, store_computed=True):
+    def Et_gs(self, T_cmb, Moles, recompute=False, store_computed=True, time=None):
         '''
         entropy prodution per kelvin for composition gravitational convection from Mg exsolution
 
@@ -1498,12 +1498,12 @@ class Custom(Nimmo):
         if self.current_values.Et_gs is not None and not recompute:
             return self.current_values.Et_gs
         else:
-            Et_gs = self.Qt_gs(T_cmb, Moles, recompute=recompute, store_computed=store_computed) / T_cmb
+            Et_gs = self.Qt_gs(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time) / T_cmb
             if store_computed:
                 self.current_values.Et_gs = Et_gs
             return Et_gs
 
-    def Et_gf(self, T_cmb, Moles, recompute=False, store_computed=True):
+    def Et_gf(self, T_cmb, Moles, recompute=False, store_computed=True, time=None):
         '''
         entropy prodution per kelvin for composition gravitational convection from Mg exsolution
 
@@ -1516,12 +1516,12 @@ class Custom(Nimmo):
         if self.current_values.Et_gf is not None and not recompute:
             return self.current_values.Et_gf
         else:
-            Et_gf = self.Qt_gf(T_cmb, Moles, recompute=recompute, store_computed=store_computed) / T_cmb
+            Et_gf = self.Qt_gf(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time) / T_cmb
             if store_computed:
                 self.current_values.Et_gf = Et_gf
             return Et_gf
 
-    def E_gm(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True):
+    def E_gm(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True, time=None):
         '''
         entropy production from compositional gravitational convection from Mg exsolution
 
@@ -1535,12 +1535,12 @@ class Custom(Nimmo):
         if self.current_values.E_gm is not None and not recompute:
             return self.current_values.E_gm
         else:
-            E_gm = self.Q_gm(T_cmb, dT_cmb_dt, XMg=XMg, XO=XO, C=C) / T_cmb
+            E_gm = self.Q_gm(T_cmb, dT_cmb_dt, Moles, time=time) / T_cmb
             if store_computed:
                 self.current_values.E_gm = E_gm
             return E_gm
 
-    def E_gs(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True):
+    def E_gs(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True, time=None):
         '''
         entropy production from compositional gravitational convection from Mg exsolution
 
@@ -1554,12 +1554,12 @@ class Custom(Nimmo):
         if self.current_values.E_gs is not None and not recompute:
             return self.current_values.E_gs
         else:
-            E_gs = self.Q_gs(T_cmb, dT_cmb_dt, XMg=XMg, XO=XO, C=C) / T_cmb
+            E_gs = self.Q_gs(T_cmb, dT_cmb_dt, Moles, time=time) / T_cmb
             if store_computed:
                 self.current_values.E_gs = E_gs
             return E_gs
 
-    def E_gf(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True):
+    def E_gf(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True, time=None):
         '''
         entropy production from compositional gravitational convection from Mg exsolution
 
@@ -1573,12 +1573,12 @@ class Custom(Nimmo):
         if self.current_values.E_gf is not None and not recompute:
             return self.current_values.E_gf
         else:
-            E_gf = self.Q_gf(T_cmb, dT_cmb_dt, XMg=XMg, XO=XO, C=C) / T_cmb
+            E_gf = self.Q_gf(T_cmb, dT_cmb_dt, Moles, time=time) / T_cmb
             if store_computed:
                 self.current_values.E_gf = E_gf
             return E_gf
 
-    def Qt_Lm(self, T_cmb, Moles, recompute=False, store_computed=True):
+    def Qt_Lm(self, T_cmb, Moles, recompute=False, store_computed=True, time=None):
         '''
         heat production per kelvin for latent heat release from MgO precipitation
 
@@ -1591,13 +1591,13 @@ class Custom(Nimmo):
         if self.current_values.Qt_Lm is not None and not recompute:
             return self.current_values.Qt_Lm
         else:
-            C_m = self.C_m(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
+            C_m = self.C_m(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
             Qt_Lm = C_m*pc.L_Hm*self.mass
             if store_computed:
                 self.current_values.Qt_Lm = Qt_Lm
             return Qt_Lm
 
-    def Qt_Ls(self, T_cmb, Moles, recompute=False, store_computed=True):
+    def Qt_Ls(self, T_cmb, Moles, recompute=False, store_computed=True, time=None):
         '''
         heat production per kelvin for latent heat release from MgO precipitation
 
@@ -1610,13 +1610,13 @@ class Custom(Nimmo):
         if self.current_values.Qt_Ls is not None and not recompute:
             return self.current_values.Qt_Ls
         else:
-            C_s = self.C_s(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
+            C_s = self.C_s(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
             Qt_Ls = C_s*pc.L_Hs*self.mass
             if store_computed:
                 self.current_values.Qt_Ls = Qt_Ls
             return Qt_Ls
 
-    def Qt_Lf(self, T_cmb, Moles, recompute=False, store_computed=True):
+    def Qt_Lf(self, T_cmb, Moles, recompute=False, store_computed=True, time=None):
         '''
         heat production per kelvin for latent heat release from MgO precipitation
 
@@ -1629,13 +1629,13 @@ class Custom(Nimmo):
         if self.current_values.Qt_Lf is not None and not recompute:
             return self.current_values.Qt_Lf
         else:
-            C_f = self.C_f(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
+            C_f = self.C_f(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
             Qt_Lf = C_f*pc.L_Hf*self.mass
             if store_computed:
                 self.current_values.Qt_Lf = Qt_Lf
             return Qt_Lf
 
-    def Q_Lm(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True):
+    def Q_Lm(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True, time=None):
         '''
         heat production from latent heat from MgO precipitation
 
@@ -1649,12 +1649,12 @@ class Custom(Nimmo):
         if self.current_values.Q_Lm is not None and not recompute:
             return self.current_values.Q_Lm
         else:
-            Q_Lm = self.Qt_Lm(T_cmb, Moles, recompute=recompute, store_computed=store_computed) * dT_cmb_dt
+            Q_Lm = self.Qt_Lm(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time) * dT_cmb_dt
             if store_computed:
                 self.current_values.Q_Lm = Q_Lm
             return Q_Lm
 
-    def Q_Ls(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True):
+    def Q_Ls(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True, time=None):
         '''
         heat production from latent heat from MgO precipitation
 
@@ -1668,12 +1668,12 @@ class Custom(Nimmo):
         if self.current_values.Q_Ls is not None and not recompute:
             return self.current_values.Q_Ls
         else:
-            Q_Ls = self.Qt_Ls(T_cmb, Moles, recompute=recompute, store_computed=store_computed) * dT_cmb_dt
+            Q_Ls = self.Qt_Ls(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time) * dT_cmb_dt
             if store_computed:
                 self.current_values.Q_Ls = Q_Ls
             return Q_Ls
 
-    def Q_Lf(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True):
+    def Q_Lf(self, T_cmb, dT_cmb_dt, Moles, recompute=False, store_computed=True, time=None):
         '''
         heat production from latent heat from MgO precipitation
 
@@ -1687,12 +1687,12 @@ class Custom(Nimmo):
         if self.current_values.Q_Lf is not None and not recompute:
             return self.current_values.Q_Lf
         else:
-            Q_Lf = self.Qt_Lf(T_cmb, Moles, recompute=recompute, store_computed=store_computed) * dT_cmb_dt
+            Q_Lf = self.Qt_Lf(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time) * dT_cmb_dt
             if store_computed:
                 self.current_values.Q_Lf = Q_Lf
             return Q_Lf
 
-    def Qt_T(self, T_cmb, Moles, recompute=False, store_computed=True):
+    def Qt_T(self, T_cmb, Moles, recompute=False, store_computed=True, time=None):
         '''
         total heat flow per kelvin for terms dependent on temperature change
 
@@ -1708,18 +1708,18 @@ class Custom(Nimmo):
             Qt_g = self.Qt_g(T_cmb, recompute=recompute, store_computed=store_computed)
             Qt_L = self.Qt_L(T_cmb, recompute=recompute, store_computed=store_computed)
             Qt_s = self.Qt_s(T_cmb, recompute=recompute, store_computed=store_computed)
-            Qt_gm = self.Qt_gm(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
-            Qt_Lm = self.Qt_Lm(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
-            Qt_gs = self.Qt_gs(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
-            Qt_Ls = self.Qt_Ls(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
-            Qt_gf = self.Qt_gf(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
-            Qt_Lf = self.Qt_Lf(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
+            Qt_gm = self.Qt_gm(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
+            Qt_Lm = self.Qt_Lm(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
+            Qt_gs = self.Qt_gs(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
+            Qt_Ls = self.Qt_Ls(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
+            Qt_gf = self.Qt_gf(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
+            Qt_Lf = self.Qt_Lf(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
             Qt_T = Qt_g + Qt_L + Qt_s + Qt_gm + Qt_Lm + Qt_gs + Qt_Ls + Qt_gf + Qt_Lf
             if store_computed:
                 self.current_values.Qt_T = Qt_T
             return Qt_T
 
-    def Et_T(self, T_cmb, Moles, recompute=False, store_computed=True):
+    def Et_T(self, T_cmb, Moles, recompute=False, store_computed=True, time=None):
         '''
         total entropy per kelvin for terms dependent on temperature change
 
@@ -1735,15 +1735,15 @@ class Custom(Nimmo):
             Et_g = self.Et_g(T_cmb, recompute=recompute, store_computed=store_computed)
             Et_L = self.Et_L(T_cmb, recompute=recompute, store_computed=store_computed)
             Et_s = self.Et_s(T_cmb, recompute=recompute, store_computed=store_computed)
-            Et_gm = self.Et_gm(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
-            Et_gs = self.Et_gs(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
-            Et_gf = self.Et_gf(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
-            Et_T = Et_g + Et_L + Et_s + Et_gm
+            Et_gm = self.Et_gm(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
+            Et_gs = self.Et_gs(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
+            Et_gf = self.Et_gf(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
+            Et_T = Et_g + Et_L + Et_s + Et_gm + Et_gs + Et_gf
             if store_computed:
                 self.current_values.Et_T = Et_T
             return Et_T
 
-    def Q_cmb(self, T_cmb, dT_cmb_dt, h, Moles, recompute=False, store_computed=True):
+    def Q_cmb(self, T_cmb, dT_cmb_dt, h, Moles, recompute=False, store_computed=True, time=None):
         '''
         total heat flow at CMB
 
@@ -1759,13 +1759,13 @@ class Custom(Nimmo):
             return self.current_values.Q_cmb
         else:
             Q_R = self.Q_R(h, recompute=recompute, store_computed=store_computed)
-            Qt_T = self.Qt_T(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
+            Qt_T = self.Qt_T(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
             Q_cmb = Q_R + Qt_T * dT_cmb_dt
             if store_computed:
                 self.current_values.Q_cmb = Q_cmb
             return Q_cmb
 
-    def Delta_E(self, T_cmb, dT_cmb_dt, h, Moles, recompute=False, store_computed=True):
+    def Delta_E(self, T_cmb, dT_cmb_dt, h, Moles, recompute=False, store_computed=True, time=None):
         '''
         total entropy balance
 
@@ -1781,14 +1781,14 @@ class Custom(Nimmo):
             return self.current_values.Delta_E
         else:
             E_R = self.E_R(T_cmb, h, recompute=recompute, store_computed=store_computed)
-            Et_T = self.Et_T(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
+            Et_T = self.Et_T(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
             E_k = self.E_k(recompute=recompute, store_computed=store_computed)
             Delta_E = E_R + Et_T * dT_cmb_dt - E_k
             if store_computed:
                 self.current_values.Delta_E = Delta_E
             return Delta_E
 
-    def Q_phi(self, T_cmb, dT_cmb_dt, h, Moles, recompute=False, store_computed=True):
+    def Q_phi(self, T_cmb, dT_cmb_dt, h, Moles, recompute=False, store_computed=True, time=None):
         '''
         heat prodution rate powering dynamo
 
@@ -1804,13 +1804,13 @@ class Custom(Nimmo):
         if self.current_values.Q_phi is not None and not recompute:
             return self.current_values.Q_phi
         else:
-            E_phi = self.E_phi(T_cmb, dT_cmb_dt, h, Moles, recompute=recompute, store_computed=store_computed)
+            E_phi = self.E_phi(T_cmb, dT_cmb_dt, h, Moles, recompute=recompute, store_computed=store_computed, time=time)
             Q_phi = E_phi * pc.T_D
             if store_computed:
                 self.current_values.Q_phi = Q_phi
             return Q_phi
 
-    def E_phi(self, T_cmb, dT_cmb_dt, h, Moles, recompute=False, store_computed=True):
+    def E_phi(self, T_cmb, dT_cmb_dt, h, Moles, recompute=False, store_computed=True, time=None):
         '''
         entropy production rate powering dynamo
 
@@ -1825,10 +1825,10 @@ class Custom(Nimmo):
         if self.current_values.E_phi is not None and not recompute:
             return self.current_values.E_phi
         else:
-            Et_T = self.Et_T(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
-            Qt_T = self.Qt_T(T_cmb, Moles, recompute=recompute, store_computed=store_computed)
+            Et_T = self.Et_T(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
+            Qt_T = self.Qt_T(T_cmb, Moles, recompute=recompute, store_computed=store_computed, time=time)
             T_R = self.T_R(T_cmb, h, recompute=recompute, store_computed=store_computed)
-            Q_cmb = self.Q_cmb(T_cmb, dT_cmb_dt, h, Moles, recompute=recompute, store_computed=store_computed)
+            Q_cmb = self.Q_cmb(T_cmb, dT_cmb_dt, h, Moles, recompute=recompute, store_computed=store_computed, time=time)
             Q_R = self.Q_R(h, recompute=recompute, store_computed=store_computed)
             E_k = self.E_k(recompute=recompute, store_computed=store_computed)
             E_phi = (Q_cmb - Q_R * (1 - Qt_T / Et_T / T_R)) * Et_T / Qt_T - E_k
@@ -1847,9 +1847,77 @@ class Custom(Nimmo):
         '''
         pc = self.params.core
         self.reset_current_values()
-        Qt_T = self.Qt_T(T_cmb, Moles)
+        Qt_T = self.Qt_T(T_cmb, Moles, time=time)
         Q_R = self.Q_R(self.heat_production_per_kg(time))
         Q_cmb = q_cmb_flux * self.outer_surface_area
         dT_cmb_dt = (Q_cmb - Q_R) / Qt_T
         return dT_cmb_dt
 
+    def compute_all_parameters(self, times, solution):
+        all = Parameters('computed values')
+        N = len(times)-1
+        all.Qg = np.empty(N)
+        all.Qs = np.empty(N)
+        all.Ql = np.empty(N)
+        all.Qlm = np.empty(N)
+        all.Qls = np.empty(N)
+        all.Qlf = np.empty(N)
+        all.Qgm = np.empty(N)
+        all.Qtgm = np.empty(N)
+        all.Qgs = np.empty(N)
+        all.Qtgs = np.empty(N)
+        all.Qgf = np.empty(N)
+        all.Qtgf = np.empty(N)
+        all.Qrc = self.heat_production_per_kg(times) * self.mass
+        all.QtT = np.empty(N)
+        all.Qk = np.empty(N)
+        all.Qcmb = np.empty(N)
+        all.Qphi = np.empty(N)
+        all.Er = np.empty(N)
+        all.Egm = np.empty(N)
+        all.Etgm = np.empty(N)
+        all.Egs = np.empty(N)
+        all.Etgs = np.empty(N)
+        all.Egf = np.empty(N)
+        all.Etgf = np.empty(N)
+        all.Eg = np.empty(N)
+        all.Es = np.empty(N)
+        all.El = np.empty(N)
+        all.Ek = np.empty(N)
+        all.DE = np.empty(N)
+        all.Ephi = np.empty(N)
+        all.dTcmb = np.diff(solution[:, 0]) / np.diff(times)
+        for i, t, T, dT, Tm in zip(range(N), times[:-1], solution[:-1, 0], all.dTcmb, solution[:-1, 1]):
+            Moles = solution[i, 2:]
+            h = self.heat_production_per_kg(t)
+            self.reset_current_values()
+            all.Qgm[i] = (self.Q_gm(T, dT, Moles, time=t, recompute=False))
+            all.Qtgm[i] = (self.Qt_gm(T, Moles, time=t, recompute=False))
+            all.Qgs[i] = (self.Q_gs(T, dT, Moles, time=t, recompute=False))
+            all.Qtgs[i] = (self.Qt_gs(T, Moles, time=t, recompute=False))
+            all.Qgf[i] = (self.Q_gf(T, dT, Moles, time=t, recompute=False))
+            all.Qtgf[i] = (self.Qt_gf(T, Moles, time=t, recompute=False))
+            all.QtT[i] = (self.Qt_T(T, Moles, time=t, recompute=False))
+            all.Qg[i] = (self.Q_g(T, dT, recompute=False))
+            all.Qs[i] = (self.Q_s(T, dT, recompute=False))
+            all.Ql[i] = (self.Q_L(T, dT, recompute=False))
+            all.Qlm[i] = (self.Q_Lm(T, dT, Moles, time=t, recompute=False))
+            all.Qls[i] = (self.Q_Ls(T, dT, Moles, time=t, recompute=False))
+            all.Qlf[i] = (self.Q_Lf(T, dT, Moles, time=t, recompute=False))
+            all.Qk[i] = (self.Q_k(T, recompute=False))
+            all.Qcmb[i] = (self.Q_cmb(T, dT, h, Moles, time=t, recompute=False))
+            all.Qphi[i] = (self.Q_phi(T, dT, h, Moles, time=t, recompute=False))
+            all.Er[i] = (self.E_R(T, h, recompute=False))
+            all.Egm[i] = (self.E_gm(T, dT, Moles, time=t, recompute=False))
+            all.Etgm[i] = (self.Et_gm(T, Moles, time=t, recompute=False))
+            all.Egs[i] = (self.E_gs(T, dT, Moles, time=t, recompute=False))
+            all.Etgs[i] = (self.Et_gs(T, Moles, time=t, recompute=False))
+            all.Egf[i] = (self.E_gf(T, dT, Moles, time=t, recompute=False))
+            all.Etgf[i] = (self.Et_gf(T, Moles, time=t, recompute=False))
+            all.Eg[i] = (self.E_g(T, dT, recompute=False))
+            all.Es[i] = (self.E_s(T, dT, recompute=False))
+            all.El[i] = (self.E_L(T, dT, recompute=False))
+            all.Ek[i] = (self.E_k(recompute=False))
+            all.DE[i] = (self.Delta_E(T, dT, h, Moles, time=t, recompute=False))
+            all.Ephi[i] = (self.E_phi(T, dT, h, Moles, time=t, recompute=False))
+        return all

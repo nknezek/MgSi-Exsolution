@@ -274,15 +274,17 @@ class MgSi():
         pr.thickness = 300 # [m] thickness of layer
         pr.rho_m = 5500 # [kg/m^3] average density of layer in lower mantle
 
-        pr.time_overturn = 800e6*Cyr2s # [s] overturn time of layer
+        pr.time_overturn = 800e6*Cyr2s # [s] overturn time of layer at present
         pr.V_c = 4/3*np.pi*3480e3**3 # [m^3] volume of total core
         pr.V_l = 4/3*np.pi*(3480e3+pr.thickness)**3 - pr.V_c # [m^3] volume of layer
         pr.mass_l_0 = pr.V_l * pr.rho_m # total initial mass of the layer
 
         pr.mass_c_0 = 2e24 # [kg] total initial mass of the core
 
-        pr.d = 1. # [-] exponent of layer overturn expression
-        pr.tau = pr.time_overturn # [s] constant of layer overturn expression
+        pr.d = 2 # [-] exponent of layer overturn expression
+        pr.tau_p = pr.time_overturn/100 # [s] constant of layer overturn expression
+        pr.tau_0 = 50e6*Cyr2s/100 # [s] constant of layer overturn expression
+        pr.T_tau = Cyr2s*1e9
         pr.P = 135e9 # [Pa] pressure at CMB
 
         pr.dKMgSiO3_KMgSiO3 = 0.0 # these should be zero as no d/dT
@@ -299,7 +301,7 @@ class MgSi():
         :return:
         '''
         M_c,_ = self.unwrap_Moles(Moles, split_coremantle=True, return_sum=False)
-        return -self.core._molmass_dict['MgO']*dMoles[0]/np.sum(self.core.M2wt(M_c))
+        return -self.core._molmass_dict['MgO']*dMoles[0]/np.sum(self.core.M2wt(np.array(M_c)))
 
     def C_s(self, dMoles, Moles):
         ''' compute wt % MgO exsolved from the core given dM and M
@@ -309,7 +311,7 @@ class MgSi():
         :return:
         '''
         M_c,_ = self.unwrap_Moles(Moles, split_coremantle=True, return_sum=False)
-        return -self.core._molmass_dict['SiO2'] * dMoles[1] / np.sum(self.core.M2wt(M_c))
+        return -self.core._molmass_dict['SiO2'] * dMoles[1] / np.sum(self.core.M2wt(np.array(M_c)))
 
     def C_f(self, dMoles, Moles):
         ''' compute wt % MgO exsolved from the core given dM and M
@@ -319,7 +321,7 @@ class MgSi():
         :return:
         '''
         M_c,_ = self.unwrap_Moles(Moles, split_coremantle=True, return_sum=False)
-        return -self.core._molmass_dict['FeO'] * dMoles[3] / np.sum(self.core.M2wt(M_c))
+        return -self.core._molmass_dict['FeO'] * dMoles[3] / np.sum(self.core.M2wt(np.array(M_c)))
 
     def _set_layer_thickness(self, thickness):
         pr = self.params.reactions
@@ -453,21 +455,36 @@ class MgSi():
         :param Moles: 
         :return: 
         '''
-        M_Mg, M_Si, M_Fe, M_O, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3 = list(Moles)
-        M_c = np.sum(Moles[:4])
-        M_m = np.sum(Moles[4:])
+        if type(Moles) is list:
+            M_Mg, M_Si, M_Fe, M_O, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3 = list(Moles)
+        elif type(Moles) is np.ndarray:
+            if len(Moles.shape) == 2:
+                M_Mg = Moles[:,0]
+                M_Si = Moles[:,1]
+                M_Fe = Moles[:,2]
+                M_O = Moles[:,3]
+                M_MgO = Moles[:,4]
+                M_SiO2 = Moles[:,5]
+                M_FeO = Moles[:,6]
+                M_MgSiO3 = Moles[:,7]
+                M_FeSiO3 = Moles[:,8]
+            if len(Moles.shape) == 1:
+                M_Mg, M_Si, M_Fe, M_O, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3 = list(Moles)
+
+        M_c = M_Mg + M_Si + M_Fe + M_O
+        M_m = M_MgO + M_SiO2 + M_FeO + M_MgSiO3 + M_FeSiO3
         if return_sum:
             if split_coremantle:
-                return list(Moles[:4])+[M_c], list(Moles[4:])+[M_m]
+                return [M_Mg, M_Si, M_Fe, M_O, M_c], [M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m]
             else:
                 return M_Mg, M_Si, M_Fe, M_O, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m
         else:
             if split_coremantle:
-                return Moles[:4], Moles[4:]
+                return [M_Mg, M_Si, M_Fe, M_O], [M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3]
             else:
-                return list(Moles)
+                return [M_Mg, M_Si, M_Fe, M_O, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3]
 
-    def erode_term(self, M_i, M_i_0, d=None, tau=None):
+    def erode_term(self, M_i, M_i_0, d=None, tau=None, time=None):
         ''' Layer erosion term given current and initial number of moles of species i and initial total moles in the layer
 
         :param M_i:
@@ -479,10 +496,10 @@ class MgSi():
         if d is None:
             d = pr.d
         if tau is None:
-            tau = pr.tau
+            tau = self.tau(time)
         return np.sign(M_i_0 - M_i) * M_i_0 / tau * ((np.abs(M_i - M_i_0) / M_i_0 + 1)**d-1)
 
-    def dMm_b(self, Moles=None, dTdt=None):
+    def dMm_b(self, Moles=None, dTdt=None, time=None):
         '''compute the erosion term incorporated directly into the equations
 
         :param Moles:
@@ -493,14 +510,15 @@ class MgSi():
         M_Mg, M_Si, M_Fe, M_O, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m = self.unwrap_Moles(Moles)
         M_MgO_b, M_SiO2_b, M_FeO_b, M_MgSiO3_b, M_FeSiO3_b = pr.Mm_b
         M_m_b = np.sum(pr.Mm_b)
-        dM_MgO_dt_b = -self.erode_term(M_MgO, M_MgO_b)/dTdt
-        dM_SiO2_dt_b = -self.erode_term(M_SiO2, M_SiO2_b)/dTdt
-        dM_FeO_dt_b = -self.erode_term(M_FeO, M_FeO_b)/dTdt
-        dM_MgSiO3_dt_b = -self.erode_term(M_MgSiO3, M_MgSiO3_b)/dTdt
-        dM_FeSiO3_dt_b = -self.erode_term(M_FeSiO3, M_FeSiO3_b)/dTdt
+        tau = self.tau(time)
+        dM_MgO_dt_b = -self.erode_term(M_MgO, M_MgO_b, tau=tau)/dTdt
+        dM_SiO2_dt_b = -self.erode_term(M_SiO2, M_SiO2_b, tau=tau)/dTdt
+        dM_FeO_dt_b = -self.erode_term(M_FeO, M_FeO_b, tau=tau)/dTdt
+        dM_MgSiO3_dt_b = -self.erode_term(M_MgSiO3, M_MgSiO3_b, tau=tau)/dTdt
+        dM_FeSiO3_dt_b = -self.erode_term(M_FeSiO3, M_FeSiO3_b, tau=tau)/dTdt
 
         # mantle visibility correction
-        tau_m = pr.tau/100
+        tau_m = self.tau(time)/100
         dM_MgO_dt_b += -self.erode_term(M_m, M_m_b, tau=tau_m)/dTdt*M_MgO/M_m
         dM_SiO2_dt_b += -self.erode_term(M_m, M_m_b, tau=tau_m)/dTdt*M_SiO2/M_m
         dM_FeO_dt_b += -self.erode_term(M_m, M_m_b, tau=tau_m)/dTdt*M_FeO/M_m
@@ -534,7 +552,7 @@ class MgSi():
         dM_FeSiO3_dt_e = self.erode_term(M_FeSiO3, M_FeSiO3_b, M_m_b)
         return [dM_MgO_dt_e, dM_SiO2_dt_e, dM_FeO_dt_e, dM_MgSiO3_dt_e, dM_FeSiO3_dt_e]
 
-    def dMoles_dT(self, Moles=None, T_cmb=None, dKs_dT=None, dTdt=None, dMi_b=None):
+    def dMoles_dT(self, Moles=None, T_cmb=None, dKs_dT=None, dTdt=None, dMi_b=None, time=None):
         '''calcluate the change in Moles vs temperature T for each molar species in the core and mantle
 
         :param Moles:
@@ -545,7 +563,7 @@ class MgSi():
         if dKs_dT is None:
             dKs_dT = self.dKs_dT(Moles=Moles, T_cmb=T_cmb)
         if dMi_b is None:
-            dMi_b = self.dMm_b(Moles=Moles, dTdt=dTdt)
+            dMi_b = self.dMm_b(Moles=Moles, dTdt=dTdt, time=time)
 
         # core
         dM_Mg_dT = self.dM_Mg_dTc(Moles, dKs_dT, dMi_b)
@@ -603,7 +621,7 @@ class MgSi():
         Moles = list(M_c) + list(M_m)
         return Moles
 
-    def dMoles_dt(self, Moles=None, T_cmb=None, dTc_dt=None, dKs_dT=None, dMoles_dT=None):
+    def dMoles_dt(self, Moles=None, T_cmb=None, dTc_dt=None, dKs_dT=None, dMoles_dT=None, time=None):
         '''calculate the change in Moles vs time (t) for each molar species in the core and mantle
 
         :param Moles:
@@ -612,7 +630,7 @@ class MgSi():
         :return:
         '''
         if dMoles_dT is None:
-            dMoles_dT = self.dMoles_dT(Moles=Moles, T_cmb=T_cmb, dKs_dT=dKs_dT, dTdt=dTc_dt)
+            dMoles_dT = self.dMoles_dT(Moles=Moles, T_cmb=T_cmb, dKs_dT=dKs_dT, dTdt=dTc_dt, time=time)
 
         dM_Mg_dT, dM_Si_dT, dM_Fe_dT, dM_O_dT, dM_Mc_dT, dM_MgO_dT, dM_SiO2_dT, \
                 dM_FeO_dT, dM_MgSiO3_dT, dM_FeSiO3_dT, dM_Mm_dT = self.unwrap_Moles(dMoles_dT)
@@ -662,6 +680,15 @@ class MgSi():
             return 0
         else:
             return 1 / (1 + 2 ** -((x - mu) / sig))
+
+    def tau(self, time):
+        '''computes the mantle overturn time given current time since formation of Earth in seconds
+
+        :param time:
+        :return:
+        '''
+        pr = self.params.reactions
+        return (pr.tau_p - pr.tau_0) * (1 - np.exp(-time / pr.T_tau)) + pr.tau_0
 
     def dM_SiO2_dTc(self, Moles, dKs, dMi_b):
         '''compute dM_SiO2 given Moles, dKDs, and dMm_b/dT'''
