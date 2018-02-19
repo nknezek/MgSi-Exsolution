@@ -1,11 +1,12 @@
 import numpy as np
+from shutil import copyfile
 import matplotlib.pyplot as plt
 # %matplotlib inline
 from imp import reload
 import sys, os
 import scipy.special as sp
 import dill
-sys.path.append('../')
+sys.path.append('../../')
 import mg_si
 import csv
 import datetime
@@ -85,6 +86,7 @@ for nu_present in nus:  #[m^2/s]
                         writer = csv.writer(f)
                         writer.writerow(csvdata)
                     f.close()
+                    copyfile('./dynamo_power.py',filepath+'dynamo_power.png')
                 except :
                     del pl
                     time = str(datetime.datetime.now())
@@ -95,8 +97,3 @@ for nu_present in nus:  #[m^2/s]
                         writer.writerow(csvdata)
                     f.close()
                 del csvdata,writer,f
-
-#dill.load(filepath+'data.m','rb')
-#all_parameters = pl.core_layer.compute_all_parameters(times, solution)
-#mplt.Q_all(pl, times, all_parameters, savename=None)
-#mplt.E_all(pl, times, all_parameters, savename=None)
