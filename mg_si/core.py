@@ -1853,9 +1853,11 @@ class Custom(Nimmo):
         dT_cmb_dt = (Q_cmb - Q_R) / Qt_T
         return dT_cmb_dt
 
-    def compute_all_parameters(self, times, solution):
+    def compute_all_parameters(self, times, solution, N_approx=1000):
         all = Parameters('computed values')
-        N = len(times)-1
+        Nt = len(times)
+        di = int((len(times)-1)//N_approx)
+        N = np.min((Nt // di, (Nt - 1) // di))
         all.Qg = np.empty(N)
         all.Qs = np.empty(N)
         all.Ql = np.empty(N)
@@ -1886,9 +1888,11 @@ class Custom(Nimmo):
         all.Ek = np.empty(N)
         all.DE = np.empty(N)
         all.Ephi = np.empty(N)
-        all.dTcmb = np.diff(solution[:, 0]) / np.diff(times)
-        for i, t, T, dT, Tm in zip(range(N), times[:-1], solution[:-1, 0], all.dTcmb, solution[:-1, 1]):
-            Moles = solution[i, 2:]
+        sol_N = (solution[::di,:])[:N,:]
+        t_N = times[::di][:N]
+        all.dTcmb = (np.diff(solution[:,0]) / np.diff(times))[::di][:N]
+        for i, t, T, dT, Tm in zip(range(N), t_N, sol_N[:,0], all.dTcmb, sol_N[:,1]):
+            Moles = sol_N[i, 2:]
             h = self.heat_production_per_kg(t)
             self.reset_current_values()
             all.Qgm[i] = (self.Q_gm(T, dT, Moles, time=t, recompute=False))
@@ -1920,4 +1924,4 @@ class Custom(Nimmo):
             all.Ek[i] = (self.E_k(recompute=False))
             all.DE[i] = (self.Delta_E(T, dT, h, Moles, time=t, recompute=False))
             all.Ephi[i] = (self.E_phi(T, dT, h, Moles, time=t, recompute=False))
-        return all
+        return t_N, all

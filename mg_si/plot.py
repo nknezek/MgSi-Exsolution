@@ -3,12 +3,24 @@ import matplotlib.pyplot as plt
 
 from .reactions import MgSi
 
-def temperature(planet, times, solution, filepath='./', savename='temperatures.png'):
-    T_cmb = solution[:,0]
-    T_um = solution[:,1]
-    t_plt = times / 3.16e7 / 1e9
+def temperature(planet, times, solution, filepath='./', savename='temperatures.png', N_approx=1000):
+    Nt = len(times)
+    di = int((len(times) - 1) // N_approx)
+    N = np.min((Nt // di, (Nt - 1) // di))
+    solution = solution[::di][:N]
+    times = times[::di][:N]
 
-    r_i = np.array([planet.core_layer.r_i(x, recompute=True) for x in solution[:,0]])
+    T_cmb = solution[:, 0]
+    T_um = solution[:, 1]
+    # M_c, M_m = planet.reactions.unwrap_Moles(solution[:, 2:], return_sum=True, split_coremantle=True)
+    t_plt = times / 3.16e7 / 1e9
+    # names_c = planet.params.reactions.core.species
+    # names_c.append('core')
+    # names_m = planet.params.reactions.mantle.species
+    # names_m.append('mantle')
+
+    r_i = np.array([planet.core_layer.r_i(x, recompute=True) for x in T_cmb])
+
     plt.figure()
     plt.plot(t_plt, T_cmb, label='Tc')
     plt.plot(t_plt, T_um, label='Tm')
@@ -21,7 +33,15 @@ def temperature(planet, times, solution, filepath='./', savename='temperatures.p
     if savename:
         plt.savefig(filepath + savename)
 
-def coremoles(planet, times, solution, filepath='./', savename='coremoles.png'):
+def coremoles(planet, times, solution, filepath='./', savename='coremoles.png', N_approx=1000):
+    Nt = len(times)
+    di = int((len(times) - 1) // N_approx)
+    N = np.min((Nt // di, (Nt - 1) // di))
+    solution = solution[::di][:N]
+    times = times[::di][:N]
+
+    T_cmb = solution[:, 0]
+    T_um = solution[:, 1]
     M_c, M_m = planet.reactions.unwrap_Moles(solution[:, 2:], return_sum=True, split_coremantle=True)
     t_plt = times / 3.16e7 / 1e9
     names_c = planet.params.reactions.core.species
@@ -52,22 +72,31 @@ def coremoles(planet, times, solution, filepath='./', savename='coremoles.png'):
     if savename:
         plt.savefig(filepath + savename)
 
-def composition(planet, times, solution, filepath='./', savename='composition.png'):
+def composition(planet, times, solution, filepath='./', savename='composition.png', N_approx=1000):
+    Nt = len(times)
+    di = int((len(times) - 1) // N_approx)
+    N = np.min((Nt // di, (Nt - 1) // di))
+    solution = solution[::di][:N]
+    times = times[::di][:N]
+
+    # T_cmb = solution[:, 0]
+    # T_um = solution[:, 1]
     M_c, M_m = planet.reactions.unwrap_Moles(solution[:, 2:], return_sum=True, split_coremantle=True)
     t_plt = times / 3.16e7 / 1e9
     names_c = planet.params.reactions.core.species
     names_c.append('core')
     names_m = planet.params.reactions.mantle.species
     names_m.append('mantle')
+
     plt.figure(figsize=(13, 4))
     plt.subplot(121)
     plt.title('Core Composition')
-    M0 = np.zeros(solution.shape[0])
+    M0 = np.zeros(N)
     for i in [0, 1, 3, 2]:
         if i != 0:
             M0 = M1
         M1 = M0 + M_c[i] / M_c[-1]
-        plt.fill_between(t_plt, M0, M1, label=planet.params.reactions.core.species[i])
+        plt.fill_between(t_plt, M0, M1, label=names_c[i])
     plt.legend(loc=0)
     plt.ylim(0, .3)
     plt.ylabel('Mole fraction')
@@ -75,12 +104,12 @@ def composition(planet, times, solution, filepath='./', savename='composition.pn
     plt.grid()
     plt.subplot(122)
     plt.title('Mantle Layer Composition')
-    M0 = np.zeros(solution.shape[0])
+    M0 = np.zeros(N)
     for i in [0, 1, 2, 3, 4]:
         if i != 0:
             M0 = M1
         M1 = M0 + M_m[i] / M_m[-1]
-        plt.fill_between(t_plt, M0, M1, label=planet.params.reactions.mantle.species[i])
+        plt.fill_between(t_plt, M0, M1, label=names_m[i])
     plt.legend(loc=0)
     plt.ylim(0, 1)
     plt.ylabel('Mole fraction')
@@ -89,15 +118,21 @@ def composition(planet, times, solution, filepath='./', savename='composition.pn
     if savename:
         plt.savefig(filepath + savename)
 
-def dTdt(planet, times, solution, filepath='./', savename='dTdt.png'):
+def dTdt(planet, times, solution, filepath='./', savename='dTdt.png', N_approx=1000):
+    Nt = len(times)
+    di = int((len(times) - 1) // N_approx)
+    N = np.min((Nt // di, (Nt - 1) // di))
+    solution = solution[::di][:N]
+    times = times[::di][:N]
+
     T_cmb = solution[:,0]
-    T_um = solution[:,1]
-    M_c, M_m = planet.reactions.unwrap_Moles(solution[:, 2:], return_sum=True, split_coremantle=True)
+    # T_um = solution[:,1]
+    # M_c, M_m = planet.reactions.unwrap_Moles(solution[:, 2:], return_sum=True, split_coremantle=True)
     t_plt = times / 3.16e7 / 1e9
-    names_c = planet.params.reactions.core.species
-    names_c.append('core')
-    names_m = planet.params.reactions.mantle.species
-    names_m.append('mantle')
+    # names_c = planet.params.reactions.core.species
+    # names_c.append('core')
+    # names_m = planet.params.reactions.mantle.species
+    # names_m.append('mantle')
     plt.figure()
 
     dTdt = np.diff(T_cmb) / np.diff(times)*3.16e7*1e9
@@ -110,18 +145,23 @@ def dTdt(planet, times, solution, filepath='./', savename='dTdt.png'):
     if savename:
         plt.savefig(filepath + savename)
 
-def MgSiOequilibrium(planet, times, solution, filepath='./', savename='MgSiOeq.png'):
-    T_cmb = solution[:,0]
-    T_um = solution[:,1]
-    M_c, M_m = planet.reactions.unwrap_Moles(solution[:, 2:], return_sum=True, split_coremantle=True)
+def MgSiOequilibrium(planet, times, solution, filepath='./', savename='MgSiOeq.png', N_approx=1000):
+    Nt = len(times)
+    di = int((len(times) - 1) // N_approx)
+    N = np.min((Nt // di, (Nt - 1) // di))
+    solution = solution[::di][:N]
+    times = times[::di][:N]
+
+    # T_cmb = solution[:,0]
+    # T_um = solution[:,1]
+    # M_c, M_m = planet.reactions.unwrap_Moles(solution[:, 2:], return_sum=True, split_coremantle=True)
     t_plt = times / 3.16e7 / 1e9
-    names_c = planet.params.reactions.core.species
-    names_c.append('core')
-    names_m = planet.params.reactions.mantle.species
-    names_m.append('mantle')
+    # names_c = planet.params.reactions.core.species
+    # names_c.append('core')
+    # names_m = planet.params.reactions.mantle.species
+    # names_m.append('mantle')
     plt.figure()
 
-    N = solution.shape[0]
     M_Mg_eq = np.zeros(N)
     M_Si_eq = np.zeros(N)
     M_O_eq = np.zeros(N)
@@ -145,42 +185,29 @@ def MgSiOequilibrium(planet, times, solution, filepath='./', savename='MgSiOeq.p
     if savename:
         plt.savefig(filepath + savename)
 
-def MgFefraction(planet, times, solution, filepath='./', savename='MgFefraction.png'):
-    T_cmb = solution[:,0]
-    T_um = solution[:,1]
+def MgFefraction(planet, times, solution, filepath='./', savename='MgFefraction.png', N_approx=1000):
+    Nt = len(times)
+    di = int((len(times) - 1) // N_approx)
+    N = np.min((Nt // di, (Nt - 1) // di))
+
     M_c, M_m = planet.reactions.unwrap_Moles(solution[:, 2:], return_sum=True, split_coremantle=True)
+    dM_Mg_dt = (np.diff(M_c[0]) / np.diff(times))[::di][:N]
+    dM_Fe_dt = (np.diff(M_c[2]) / np.diff(times))[::di][:N]
+
+    times = times[::di][:N]
+    solution = solution[::di][:N]
+
     t_plt = times / 3.16e7 / 1e9
-    names_c = planet.params.reactions.core.species
-    names_c.append('core')
-    names_m = planet.params.reactions.mantle.species
-    names_m.append('mantle')
-    plt.figure()
-
-    plt.title('Mg/(Mg+Fe)')
-    dM_Mg_dt = np.diff(M_c[0]) / np.diff(times)
-    dM_Si_dt = np.diff(M_c[1]) / np.diff(times)
-    dM_Fe_dt = np.diff(M_c[2]) / np.diff(times)
-    dM_O_dt = np.diff(M_c[3]) / np.diff(times)
-
-    plt.plot(t_plt[:-1], dM_Mg_dt / (dM_Mg_dt + dM_Fe_dt), label='Mg/Fe exsolve from core')
-
+    M_c, M_m = planet.reactions.unwrap_Moles(solution[:, 2:], return_sum=True, split_coremantle=True)
     M_MgO = M_m[0]
     M_SiO2 = M_m[1]
     M_FeO = M_m[2]
     M_MgSiO3 = M_m[3]
     M_FeSiO3 = M_m[4]
 
-    X_Mg = M_c[0] / M_c[-1]
-    X_Si = M_c[1] / M_c[-1]
-    X_Fe = M_c[2] / M_c[-1]
-    X_O = M_c[3] / M_c[-1]
-
-    X_MgO = M_MgO / M_m[-1]
-    X_FeO = M_FeO / M_m[-1]
-    X_SiO2 = M_SiO2 / M_m[-1]
-    X_MgSiO3 = M_MgSiO3 / M_m[-1]
-    X_FeSiO3 = M_FeSiO3 / M_m[-1]
-
+    plt.figure()
+    plt.title('Mg/(Mg+Fe)')
+    plt.plot(t_plt, dM_Mg_dt / (dM_Mg_dt + dM_Fe_dt), label='Mg/Fe exsolve from core')
     plt.plot(t_plt, M_MgO / (M_MgO + M_FeO), label='MgO')
     plt.plot(t_plt, M_MgSiO3 / (M_MgSiO3 + M_FeSiO3), '--', label='MgSiO3')
     plt.legend(loc=0)
@@ -191,15 +218,16 @@ def MgFefraction(planet, times, solution, filepath='./', savename='MgFefraction.
     if savename:
         plt.savefig(filepath + savename)
 
-def K_vals(planet, times, solution, filepath='./', savename='K_vals.png'):
-    T_cmb = solution[:,0]
-    T_um = solution[:,1]
+def K_vals(planet, times, solution, filepath='./', savename='K_vals.png', N_approx=1000):
+    Nt = len(times)
+    di = int((len(times) - 1) // N_approx)
+    N = np.min((Nt // di, (Nt - 1) // di))
+    times = times[::di][:N]
+    solution = solution[::di][:N]
+
     M_c, M_m = planet.reactions.unwrap_Moles(solution[:, 2:], return_sum=True, split_coremantle=True)
     t_plt = times / 3.16e7 / 1e9
-    names_c = planet.params.reactions.core.species
-    names_c.append('core')
-    names_m = planet.params.reactions.mantle.species
-    names_m.append('mantle')
+
     plt.figure()
 
     X_Mg = M_c[0] / M_c[-1]
@@ -262,7 +290,6 @@ def Q_all(planet, times, all_parameters, filepath='./', savename='Q_all.png'):
     plt.xlabel('time (Byr)')
     if savename:
         plt.savefig(filepath + savename)
-
 
 def E_all(planet, times, all_parameters, filepath='./', savename='E_all.png'):
     t_plt = times / 3.17e7 / 1e9
