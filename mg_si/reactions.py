@@ -324,6 +324,8 @@ class MgSi():
         return -self.core._molmass_dict['FeO'] * dMoles[3] / np.sum(self.core.M2wt(np.array(M_c)))
 
     def _set_overturn_time(self,overturn):
+        Cyr2s = 365.25*24*3600
+        pr = self.params.reactions
         pr.time_overturn = overturn*1e6*Cyr2s # [s] overturn time of layer at present
         pr.tau_p = pr.time_overturn/100 # [s] constant of layer overturn expression
         scale_fac = (overturn/800.0) # scale the time-scales by this number
