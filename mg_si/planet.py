@@ -67,7 +67,7 @@ class Stevenson_backward(Planet):
         return np.array([-dTc_dt, -dTm_dt])
 
     def integrate(self, times, x0, full_output=False):
-        solution = integrate.odeint(self.ODE, x0, times, full_output=full_output)
+        solution = integrate.odeint(self.ODE, x0, times, full_output=full_output,h0=1e7,rtol=1e-4,atol=1e-4,mxstep=5000000)
         return solution
 
 class NimmoStevenson(Planet):
@@ -91,7 +91,7 @@ class NimmoStevenson(Planet):
         return np.array([dTc_dt, dTm_dt])
 
     def integrate(self, times, x0, full_output=False):
-        solution = integrate.odeint(self.ODE, x0, times, full_output=full_output)
+        solution = integrate.odeint(self.ODE, x0, times, full_output=full_output,h0=1e7,rtol=1e-4,atol=1e-4,mxstep=5000000)
         return solution
 
 class Custom(Planet):
@@ -134,5 +134,5 @@ class Custom(Planet):
         :param full_output:
         :return:
         '''
-        solution = integrate.odeint(self.ODE, x0, times, full_output=full_output)
+        solution = integrate.odeint(self.ODE, x0, times, full_output=full_output,h0=1e7,rtol=1e-4,atol=1e-4,mxstep=5000000)
         return solution

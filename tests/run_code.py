@@ -86,7 +86,7 @@ for nu_present in nus:  #[m^2/s]
                         writer = csv.writer(f)
                         writer.writerow(csvdata)
                     f.close()
-                    copyfile('./dynamo_power.py',filepath+'dynamo_power.png')
+                    copyfile('./dynamo_power.py',filepath+'dynamo_power.py')
                 except :
                     del pl
                     time = str(datetime.datetime.now())
