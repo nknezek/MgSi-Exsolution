@@ -323,10 +323,17 @@ class MgSi():
         M_c,_ = self.unwrap_Moles(Moles, split_coremantle=True, return_sum=False)
         return -self.core._molmass_dict['FeO'] * dMoles[3] / np.sum(self.core.M2wt(np.array(M_c)))
 
+    def _set_overturn_time(self,overturn):
+        pr.time_overturn = overturn*1e6*Cyr2s # [s] overturn time of layer at present
+        pr.tau_p = pr.time_overturn/100 # [s] constant of layer overturn expression
+        scale_fac = (overturn/800.0) # scale the time-scales by this number
+        pr.tau_0 = scale_fac*50e6*Cyr2s/100 # [s] constant of layer overturn expression
+
     def _set_layer_thickness(self, thickness):
         pr = self.params.reactions
         pr.thickness = thickness
         pr.V_l = 4/3*np.pi*(3480e3+pr.thickness)**3 - pr.V_c # [m^3] volume of layer
+        pr.mass_l_0 = pr.V_l * pr.rho_m # total initial mass of the layer -- this was not added earlier
 
     def dKs_dT(self, T_cmb, Moles):
         dKMgO_dT_KMgO = self.dKMgO_dT_KMgO(T_cmb, Moles)
