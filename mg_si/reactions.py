@@ -254,7 +254,7 @@ class Mantle_MgSi(Molar_Calculations):
         X_FeSiO3 = X_MgFeSiO3*(1-fraction_MgFe)
         Xm = np.array([X_MgO, X_SiO2, X_FeO, X_MgSiO3, X_FeSiO3])
         if M_tot is None:
-            mass_l = pr.rho_m* pr.V_l  # [kg]
+            mass_l = pr.mass_l_0  # [kg]
         pr.Mm_b = self.X2M(Xm, wt_tot=mass_l)
         return pr.Mm_b
 
@@ -323,13 +323,19 @@ class MgSi():
         M_c,_ = self.unwrap_Moles(Moles, split_coremantle=True, return_sum=False)
         return -self.core._molmass_dict['FeO'] * dMoles[3] / np.sum(self.core.M2wt(np.array(M_c)))
 
-    def _set_overturn_time(self,overturn):
+    def _set_overturn_time(self,overturn_present):
+        ''' sets the mantle overturn time function given overturn time at present [Myrs]
+
+        :param overturn_present: [Myr]
+        :return:
+        '''
         Cyr2s = 365.25*24*3600
         pr = self.params.reactions
-        pr.time_overturn = overturn*1e6*Cyr2s # [s] overturn time of layer at present
-        pr.tau_p = pr.time_overturn/100 # [s] constant of layer overturn expression
-        scale_fac = (overturn/800.0) # scale the time-scales by this number
-        pr.tau_0 = scale_fac*50e6*Cyr2s/100 # [s] constant of layer overturn expression
+        pr.time_overturn_p = overturn_present*1e6*Cyr2s # [s] overturn time of layer at present
+        pr.time_overturn_0 = pr.time_overturn_p/16.
+        scale_fac = 0.01
+        pr.tau_p = pr.time_overturn_p * scale_fac # [s] constant of layer overturn expression
+        pr.tau_0 = pr.time_overturn_0 * scale_fac # [s] constant of layer overturn expression
 
     def _set_layer_thickness(self, thickness):
         pr = self.params.reactions
