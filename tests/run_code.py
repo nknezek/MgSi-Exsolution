@@ -2,7 +2,6 @@ import numpy as np
 from shutil import copyfile
 import matplotlib.pyplot as plt
 # %matplotlib inline
-from imp import reload
 import sys, os
 import scipy.special as sp
 import dill
@@ -10,7 +9,6 @@ sys.path.append('../')
 import mg_si
 import csv
 import datetime
-import warnings
 
 from mg_si import plot as mplt
 
