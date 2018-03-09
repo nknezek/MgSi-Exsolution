@@ -1256,7 +1256,7 @@ class Custom(Nimmo):
             if self.current_values.dKs_dT is not None and not recompute:
                 dKs_dT = self.current_values.dKs_dT
             else:
-                dKs_dT = self.planet.reactions.dKs_dT(T_cmb, Moles)
+                dKs_dT = self.planet.reactions.dKs_dT(T_cmb, Moles, dTdt=dTdt_est, time=time)
                 if store_computed:
                     self.current_values.dKs_dT = dKs_dT
 
@@ -1291,7 +1291,7 @@ class Custom(Nimmo):
             if self.current_values.dKs_dT is not None and not recompute:
                 dKs_dT = self.current_values.dKs_dT
             else:
-                dKs_dT = self.planet.reactions.dKs_dT(T_cmb, Moles)
+                dKs_dT = self.planet.reactions.dKs_dT(T_cmb, Moles, dTdt=dTdt_est, time=time)
                 if store_computed:
                     self.current_values.dKs_dT = dKs_dT
 
@@ -1328,7 +1328,7 @@ class Custom(Nimmo):
             if self.current_values.dKs_dT is not None and not recompute:
                 dKs_dT = self.current_values.dKs_dT
             else:
-                dKs_dT = self.planet.reactions.dKs_dT(T_cmb, Moles)
+                dKs_dT = self.planet.reactions.dKs_dT(T_cmb, Moles, dTdt=dTdt_est, time=time)
                 if store_computed:
                     self.current_values.dKs_dT = dKs_dT
 
@@ -1870,7 +1870,7 @@ class Custom(Nimmo):
         all.Qtgs = np.empty(N)
         all.Qgf = np.empty(N)
         all.Qtgf = np.empty(N)
-        all.Qrc = self.heat_production_per_kg(times) * self.mass
+        all.Qrc = self.heat_production_per_kg(times[::di][:N]) * self.mass
         all.QtT = np.empty(N)
         all.Qk = np.empty(N)
         all.Qcmb = np.empty(N)

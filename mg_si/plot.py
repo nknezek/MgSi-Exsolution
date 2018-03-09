@@ -230,16 +230,16 @@ def K_vals(planet, times, solution, filepath='./', savename='K_vals.png', N_appr
 
     plt.figure()
 
-    X_Mg = M_c[0] / M_c[-1]
-    X_Si = M_c[1] / M_c[-1]
-    X_Fe = M_c[2] / M_c[-1]
-    X_O = M_c[3] / M_c[-1]
+    X_Mg = M_c[0] / M_c[4]
+    X_Si = M_c[1] / M_c[4]
+    X_Fe = M_c[2] / M_c[4]
+    X_O = M_c[3] / M_c[4]
 
-    X_MgO = M_m[0] / M_m[-1]
-    X_FeO = M_m[1]/ M_m[-1]
-    X_SiO2 = M_m[2]/ M_m[-1]
-    X_MgSiO3 = M_m[3] / M_m[-1]
-    X_FeSiO3 = M_m[4] / M_m[-1]
+    X_MgO = M_m[0] / M_m[5]
+    X_SiO2 = M_m[1]/ M_m[5]
+    X_FeO = M_m[2]/ M_m[5]
+    X_MgSiO3 = M_m[3] / M_m[5]
+    X_FeSiO3 = M_m[4] / M_m[5]
 
     K1 = X_MgO * X_SiO2 / X_MgSiO3
     K2 = X_FeO * X_SiO2 / X_FeSiO3
@@ -253,6 +253,9 @@ def K_vals(planet, times, solution, filepath='./', savename='K_vals.png', N_appr
 
     plt.figure()
     plt.title('KD Values over time')
+    plt.plot(t_plt, K1, '--', label='K_MgSiO3 from X')
+    plt.plot(t_plt, K2, '--', label='K_FeSiO3 from X')
+    plt.plot(t_plt, K3, '--', label='K_MgFe from X')
     plt.plot(t_plt, K4_dat, '-', label='K_Mg eqn')
     plt.plot(t_plt, K4, '--', label='K_Mg from X')
     plt.plot(t_plt, K5_dat, '-', label='K_Fe eqn')
@@ -270,18 +273,19 @@ def Q_all(planet, times, all_parameters, filepath='./', savename='Q_all.png'):
     t_plt = times / 3.17e7 / 1e9
     all = all_parameters
     plt.figure(figsize=(10, 7))
-    plt.plot(t_plt[1:], all.Qgm / 1e12, 'g-', label="Qg MgO")
-    plt.plot(t_plt[1:], all.Qlm / 1e12, 'g--', label="Ql MOg")
-    plt.plot(t_plt[1:], all.Qgs / 1e12, 'b-', label="Qg SiO2")
-    plt.plot(t_plt[1:], all.Qls / 1e12, 'b--', label="Ql SiO2")
-    plt.plot(t_plt[1:], all.Qgf / 1e12, 'r-', label="Qg FeO")
-    plt.plot(t_plt[1:], all.Qlf / 1e12, 'r--', label="Ql FeO")
-    plt.plot(t_plt, all.Qrc / 1e12, label='Qr core')
-    plt.plot(t_plt[1:], all.Qs / 1e12, label="Qs secular cooling")
-    plt.plot(t_plt[1:], all.Qg / 1e12, label="Qg i.core")
-    plt.plot(t_plt[1:], all.Ql / 1e12, label="Ql i.core")
-    plt.plot(t_plt[1:], all.Qcmb / 1e12, label="Qcmb")
-    plt.plot(t_plt[1:], all.Qphi / 1e12, 'k--', label="Qphi")
+    plt.plot(t_plt, all.Qgm / 1e12, 'g-', label="Qg MgO")
+    plt.plot(t_plt, all.Qlm / 1e12, 'g--', label="Ql MOg")
+    plt.plot(t_plt, all.Qgs / 1e12, 'b-', label="Qg SiO2")
+    plt.plot(t_plt, all.Qls / 1e12, 'b--', label="Ql SiO2")
+    plt.plot(t_plt, all.Qgf / 1e12, 'r-', label="Qg FeO")
+    plt.plot(t_plt, all.Qlf / 1e12, 'r--', label="Ql FeO")
+    # plt.plot(t_plt, all.Qrc / 1e12, label='Qr core')
+    plt.plot(t_plt, all.Qs / 1e12, label="Qs secular cooling")
+    plt.plot(t_plt, all.Qg / 1e12, label="Qg i.core")
+    plt.plot(t_plt, all.Ql / 1e12, label="Ql i.core")
+    plt.plot(t_plt, all.Qcmb / 1e12, label="Qcmb")
+    plt.plot(t_plt, all.Qphi / 1e12, 'k--', label="Qphi")
+    plt.plot(t_plt, all.Qphi / 1e12, 'k-', label="Qk")
     plt.legend(loc=0)
     plt.grid()
     plt.ylim(0, 70)
@@ -296,17 +300,17 @@ def E_all(planet, times, all_parameters, filepath='./', savename='E_all.png'):
     all = all_parameters
     min_E = 100e6  # [MW/K]
     plt.figure(figsize=(10, 7))
-    plt.plot(t_plt[1:], all.Ephi / 1e6, '--k', label="Entropy available for Dynamo", linewidth=2.)
+    plt.plot(t_plt, all.Ephi / 1e6, '--k', label="Entropy available for Dynamo", linewidth=2.)
     plt.plot(t_plt, min_E * np.ones_like(t_plt) / 1e6, '--k', label='Min. Ent. for Dynamo', linewidth=10, alpha=0.5)
-    plt.plot(t_plt[1:], all.Es / 1e6, label="Specific Heat (cooling)")
-    plt.plot(t_plt[1:], all.Egm / 1e6, label="MgO (grav.)")
-    plt.plot(t_plt[1:], all.Egs / 1e6, label="SiO2 (grav.)")
-    plt.plot(t_plt[1:], all.Egf / 1e6, label="FeO (grav.)")
-    plt.plot(t_plt[1:], all.Eg / 1e6, label="IC (grav.)")
-    plt.plot(t_plt[1:], all.El / 1e6, label="IC (latent heat)")
-    plt.plot(t_plt[1:], all.Er / 1e6, label='Radioactive heating')
-    plt.plot(t_plt[1:], all.Ek / 1e6, label="Adiabatic entropy sink")
-    # plt.plot(t_plt[1:], DE/1e6, label="E tot")
+    plt.plot(t_plt, all.Es / 1e6, label="Specific Heat (cooling)")
+    plt.plot(t_plt, all.Egm / 1e6, label="MgO (grav.)")
+    plt.plot(t_plt, all.Egs / 1e6, label="SiO2 (grav.)")
+    plt.plot(t_plt, all.Egf / 1e6, label="FeO (grav.)")
+    plt.plot(t_plt, all.Eg / 1e6, label="IC (grav.)")
+    plt.plot(t_plt, all.El / 1e6, label="IC (latent heat)")
+    plt.plot(t_plt, all.Er / 1e6, label='Radioactive heating')
+    plt.plot(t_plt, all.Ek / 1e6, label="Adiabatic entropy sink")
+    # plt.plot(t_plt, DE/1e6, label="E tot")
     plt.ylim(0, 3000)
     plt.xlim(0, 4.568)
     plt.title('Entropy Production')

@@ -23,8 +23,8 @@ class Molar_Calculations():
             'H': 1.00794,
             'C': 12.0107, }
         molmass['MgO'] = molmass['Mg'] + molmass['O']
-        molmass['FeO'] = molmass['Fe'] + molmass['O']
         molmass['SiO2'] = molmass['Si'] + 2 * molmass['O']
+        molmass['FeO'] = molmass['Fe'] + molmass['O']
         molmass['MgSiO3'] = molmass['Mg'] + molmass['Si'] + 3 * molmass['O']
         molmass['FeSiO3'] = molmass['Fe'] + molmass['Si'] + 3 * molmass['O']
         self._molmass_dict = molmass
@@ -253,6 +253,8 @@ class Mantle_MgSi(Molar_Calculations):
         X_MgSiO3 = X_MgFeSiO3*fraction_MgFe
         X_FeSiO3 = X_MgFeSiO3*(1-fraction_MgFe)
         Xm = np.array([X_MgO, X_SiO2, X_FeO, X_MgSiO3, X_FeSiO3])
+        pr.K_MgSiO3_b = X_MgO*X_SiO2/X_MgSiO3
+        pr.K_FeSiO3_b = X_FeO*X_SiO2/X_FeSiO3
         if M_tot is None:
             mass_l = pr.mass_l_0  # [kg]
         pr.Mm_b = self.X2M(Xm, wt_tot=mass_l)
@@ -343,12 +345,12 @@ class MgSi():
         pr.V_l = 4/3*np.pi*(3480e3+pr.thickness)**3 - pr.V_c # [m^3] volume of layer
         pr.mass_l_0 = pr.V_l * pr.rho_m # total initial mass of the layer -- this was not added earlier
 
-    def dKs_dT(self, T_cmb, Moles):
+    def dKs_dT(self, T_cmb=None, Moles=None, dTdt=None, time=None):
         dKMgO_dT_KMgO = self.dKMgO_dT_KMgO(T_cmb, Moles)
         dKSiO2_dT_KSiO2 = self.dKSiO2_dT_KSiO2(T_cmb, Moles)
         dKFeO_dT_KFeO = self.dKFeO_dT_KFeO(T_cmb, Moles)
-        dKMgSiO3_dT_KMgSiO3 = self.dKMgSiO3_dT_KMgSiO3(T_cmb, Moles)
-        dKFeSiO3_dT_KFeSiO3 = self.dKFeSiO3_dT_KFeSiO3(T_cmb, Moles)
+        dKMgSiO3_dT_KMgSiO3 = self.dKMgSiO3_dT_KMgSiO3(T_cmb=T_cmb, Moles=Moles, dTdt=dTdt, time=time)
+        dKFeSiO3_dT_KFeSiO3 = self.dKFeSiO3_dT_KFeSiO3(T_cmb=T_cmb, Moles=Moles, dTdt=dTdt, time=time)
         dKs_dT = [dKMgO_dT_KMgO, dKSiO2_dT_KSiO2, dKFeO_dT_KFeO, dKMgSiO3_dT_KMgSiO3, dKFeSiO3_dT_KFeSiO3]
         return dKs_dT
 
@@ -380,7 +382,7 @@ class MgSi():
         KFeO, dKFeO_dT = self.func_KD_FeO_val(T_cmb)
         return dKFeO_dT / KFeO
 
-    def dKMgSiO3_dT_KMgSiO3(self, T_cmb, Moles):
+    def dKMgSiO3_dT_KMgSiO3(self, T_cmb=None, Moles=None, dTdt=None, time=None):
         '''computes dK_MgSiO3, normally = 0
 
         :param T_cmb:
@@ -388,10 +390,14 @@ class MgSi():
         :return:
         '''
         pr = self.params.reactions
-        dKMgSiO3_KMgSiO3 = pr.dKMgSiO3_KMgSiO3
+        M_Mg, M_Si, M_Fe, M_O, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m = self.unwrap_Moles(Moles)
+        X_i = self.mantle.M2X([M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3])
+        K_MgSiO3 = X_i[0]*X_i[1]/X_i[3]
+        dKMgSiO3_KMgSiO3 = self.erode_term(K_MgSiO3,pr.K_MgSiO3_b, time=time, d=0.5)/(K_MgSiO3 * dTdt)
+        # dKMgSiO3_KMgSiO3 = pr.dKMgSiO3_KMgSiO3
         return dKMgSiO3_KMgSiO3
 
-    def dKFeSiO3_dT_KFeSiO3(self, T_cmb, Moles):
+    def dKFeSiO3_dT_KFeSiO3(self, T_cmb=None, Moles=None, dTdt=None, time=None):
         '''computes dK_FeSiO3, normally = 0
 
         :param T_cmb:
@@ -399,7 +405,12 @@ class MgSi():
         :return:
         '''
         pr = self.params.reactions
-        dKFeSiO3_KFeSiO3 = pr.dKFeSiO3_KFeSiO3
+        M_Mg, M_Si, M_Fe, M_O, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m = self.unwrap_Moles(Moles)
+        X_i = self.mantle.M2X([M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3])
+        K_FeSiO3 = X_i[2]*X_i[1]/X_i[4]
+
+        dKFeSiO3_KFeSiO3 = self.erode_term(K_FeSiO3,pr.K_FeSiO3_b, time=time, d=0.5)/(K_FeSiO3 * dTdt)
+        # dKFeSiO3_KFeSiO3 = pr.dKFeSiO3_KFeSiO3
         return dKFeSiO3_KFeSiO3
 
     def func_KD_SiO2_val(self, X_Si, X_O, T_inp, P_inp_base=139e6, temp_diff_pm=10):
@@ -508,6 +519,8 @@ class MgSi():
         :return:
         '''
         pr =self.params.reactions
+        if tau is None and time is None:
+            raise ValueError('have to pass in time or tau')
         if d is None:
             d = pr.d
         if tau is None:
@@ -542,11 +555,12 @@ class MgSi():
         return [dM_MgO_dt_b, dM_SiO2_dt_b, dM_FeO_dt_b, dM_MgSiO3_dt_b, dM_FeSiO3_dt_b]
 
     def dMi_dt_erode(self, Moles):
-        '''calculate the erosion rate for each molar species in the mantle layer
+        '''OBSOLETE calculate the erosion rate for each molar species in the mantle layer
 
         :param Moles:
         :return:
         '''
+        raise NotImplementedError("Deprecated")
         pr = self.params.reactions
 
         # calculate the background mantle composition with proper Mg-Fe fraction
@@ -576,7 +590,7 @@ class MgSi():
         :return:
         '''
         if dKs_dT is None:
-            dKs_dT = self.dKs_dT(Moles=Moles, T_cmb=T_cmb)
+            dKs_dT = self.dKs_dT(Moles=Moles, T_cmb=T_cmb, dTdt=dTdt, time=time)
         if dMi_b is None:
             dMi_b = self.dMm_b(Moles=Moles, dTdt=dTdt, time=time)
 
@@ -585,7 +599,7 @@ class MgSi():
         dM_Si_dT = self.dM_Si_dTc(Moles, dKs_dT, dMi_b)
         dM_O_dT = self.dM_O_dTc(Moles, dKs_dT, dMi_b)
         dM_Fe_dT = self.dM_Fe_dTc(Moles, dKs_dT, dMi_b)
-
+        # Don't let these species go into the core
         dM_Mg_dT = self.logit(dM_Mg_dT)*dM_Mg_dT
         dM_Si_dT = self.logit(dM_Si_dT)*dM_Si_dT
         dM_O_dT = self.logit(dM_O_dT)*dM_O_dT
@@ -634,6 +648,8 @@ class MgSi():
         M_m = self.mantle.X2M(X_m, wt_tot=pr.mass_l_0)
         M_c = self.core.X2M(X_c, wt_tot=pr.mass_c_0)
         Moles = list(M_c) + list(M_m)
+        if np.min(Moles) < 0.:
+            raise ValueError("initial core composition invalid, no mantle equilibrium composition possible.")
         return Moles
 
     def dMoles_dt(self, Moles=None, T_cmb=None, dTc_dt=None, dKs_dT=None, dMoles_dT=None, time=None):
