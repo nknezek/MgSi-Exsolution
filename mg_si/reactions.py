@@ -599,11 +599,20 @@ class MgSi():
         dM_Si_dT = self.dM_Si_dTc(Moles, dKs_dT, dMi_b)
         dM_O_dT = self.dM_O_dTc(Moles, dKs_dT, dMi_b)
         dM_Fe_dT = self.dM_Fe_dTc(Moles, dKs_dT, dMi_b)
+
         # Don't let these species go into the core
         dM_Mg_dT = self.logit(dM_Mg_dT)*dM_Mg_dT
         dM_Si_dT = self.logit(dM_Si_dT)*dM_Si_dT
         dM_O_dT = self.logit(dM_O_dT)*dM_O_dT
 
+        # Don't let these species exsolve unless they are near their equilibrium values
+        M_Mg, M_Si, M_Fe, M_O, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m = self.unwrap_Moles(Moles)
+        M_Mg_eq, M_Si_eq, M_O_eq = self.compute_Moles_eq(Moles=Moles, T_cmb=T_cmb)
+        epsilon = 0.1
+        near = 1-epsilon
+        dM_Mg_dT = self.logit((M_Mg-M_Mg_eq*near)/np.abs(M_Mg_eq)*100)*dM_Mg_dT
+        dM_Si_dT = self.logit((M_Si-M_Si_eq*near)/np.abs(M_Si_eq)*100)*dM_Si_dT
+        dM_O_dT = self.logit((M_O-M_O_eq*near)/np.abs(M_O_eq)*100)*dM_O_dT
 
         # mantle
         dM_MgO_dT = self.dM_MgO_dTc(Moles, dKs_dT, dMi_b)

@@ -47,8 +47,7 @@
   * 7x7 parameter tradeoff
   * X_Mg vs X_Si grid for 
     * T_cmb vs nu?
-    * overturn vs layter thick?
-    * ​
+    * overturn vs layter thick?​
 
   ### 3/8/18 Status
 
@@ -60,4 +59,7 @@
 
   * Notable problem: Core is significantly sub-adiabatic throughout most of it's history, but our core assumes adiabatic profile
   * lots of Mg and Si probably indicates significantly sub-adiabatic heatflow at the present day — strong thermal boundary layer
-  * ​
+    * actually this is not true with latest runs, so maybe not a problem
+  * **PROBLEM:** Perhaps the Si / Mg exsolution is not working? 
+    * dM_Mg/dT is logistic so can't push into core, but starts coming out as soon as the equlibrium starts decreasing, even if the physical value in the core is still way below the actual equlibrium value. 
+    * Need to fix: logisitic of actual moles equlibirum and moles actual
