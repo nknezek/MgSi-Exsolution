@@ -334,8 +334,8 @@ class MgSi():
         Cyr2s = 365.25*24*3600
         pr = self.params.reactions
         pr.time_overturn_p = overturn_present*1e6*Cyr2s # [s] overturn time of layer at present
-        pr.time_overturn_0 = pr.time_overturn_p/16.
-        scale_fac = 0.01
+        pr.time_overturn_0 = pr.time_overturn_p/8.
+        scale_fac = 0.1
         pr.tau_p = pr.time_overturn_p * scale_fac # [s] constant of layer overturn expression
         pr.tau_0 = pr.time_overturn_0 * scale_fac # [s] constant of layer overturn expression
 
@@ -393,7 +393,7 @@ class MgSi():
         M_Mg, M_Si, M_Fe, M_O, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m = self.unwrap_Moles(Moles)
         X_i = self.mantle.M2X([M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3])
         K_MgSiO3 = X_i[0]*X_i[1]/X_i[3]
-        dKMgSiO3_KMgSiO3 = self.erode_term(K_MgSiO3,pr.K_MgSiO3_b, time=time, d=1)/(K_MgSiO3 * dTdt)
+        dKMgSiO3_KMgSiO3 = self.erode_term(K_MgSiO3, pr.K_MgSiO3_b, time=time, d=1)/(K_MgSiO3 * dTdt)
         # dKMgSiO3_KMgSiO3 = pr.dKMgSiO3_KMgSiO3
         return dKMgSiO3_KMgSiO3
 
@@ -408,7 +408,7 @@ class MgSi():
         M_Mg, M_Si, M_Fe, M_O, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m = self.unwrap_Moles(Moles)
         X_i = self.mantle.M2X([M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3])
         K_FeSiO3 = X_i[2]*X_i[1]/X_i[4]
-        dKFeSiO3_KFeSiO3 = self.erode_term(K_FeSiO3,pr.K_FeSiO3_b, time=time, d=1)/(K_FeSiO3 * dTdt)
+        dKFeSiO3_KFeSiO3 = self.erode_term(K_FeSiO3, pr.K_FeSiO3_b, time=time, d=1)/(K_FeSiO3 * dTdt)
         # dKFeSiO3_KFeSiO3 = pr.dKFeSiO3_KFeSiO3
         return dKFeSiO3_KFeSiO3
 
