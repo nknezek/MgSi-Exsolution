@@ -325,7 +325,7 @@ class MgSi():
         M_c,_ = self.unwrap_Moles(Moles, split_coremantle=True, return_sum=False)
         return -self.core._molmass_dict['FeO'] * dMoles[3] / np.sum(self.core.M2wt(np.array(M_c)))
 
-    def _set_overturn_time(self,overturn_present):
+    def _set_overturn_time(self, overturn_present):
         ''' sets the mantle overturn time function given overturn time at present [Myrs]
 
         :param overturn_present: [Myr]
@@ -393,7 +393,7 @@ class MgSi():
         M_Mg, M_Si, M_Fe, M_O, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m = self.unwrap_Moles(Moles)
         X_i = self.mantle.M2X([M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3])
         K_MgSiO3 = X_i[0]*X_i[1]/X_i[3]
-        dKMgSiO3_KMgSiO3 = self.erode_term(K_MgSiO3,pr.K_MgSiO3_b, time=time, d=0.5)/(K_MgSiO3 * dTdt)
+        dKMgSiO3_KMgSiO3 = self.erode_term(K_MgSiO3,pr.K_MgSiO3_b, time=time, d=1)/(K_MgSiO3 * dTdt)
         # dKMgSiO3_KMgSiO3 = pr.dKMgSiO3_KMgSiO3
         return dKMgSiO3_KMgSiO3
 
@@ -408,8 +408,7 @@ class MgSi():
         M_Mg, M_Si, M_Fe, M_O, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m = self.unwrap_Moles(Moles)
         X_i = self.mantle.M2X([M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3])
         K_FeSiO3 = X_i[2]*X_i[1]/X_i[4]
-
-        dKFeSiO3_KFeSiO3 = self.erode_term(K_FeSiO3,pr.K_FeSiO3_b, time=time, d=0.5)/(K_FeSiO3 * dTdt)
+        dKFeSiO3_KFeSiO3 = self.erode_term(K_FeSiO3,pr.K_FeSiO3_b, time=time, d=1)/(K_FeSiO3 * dTdt)
         # dKFeSiO3_KFeSiO3 = pr.dKFeSiO3_KFeSiO3
         return dKFeSiO3_KFeSiO3
 
@@ -593,6 +592,8 @@ class MgSi():
             dKs_dT = self.dKs_dT(Moles=Moles, T_cmb=T_cmb, dTdt=dTdt, time=time)
         if dMi_b is None:
             dMi_b = self.dMm_b(Moles=Moles, dTdt=dTdt, time=time)
+        if dTdt > 0.:
+            raise AssertionError("dTdt should not be >0., something is wrong.")
 
         # core
         dM_Mg_dT = self.dM_Mg_dTc(Moles, dKs_dT, dMi_b)
@@ -608,11 +609,13 @@ class MgSi():
         # Don't let these species exsolve unless they are near their equilibrium values
         M_Mg, M_Si, M_Fe, M_O, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m = self.unwrap_Moles(Moles)
         M_Mg_eq, M_Si_eq, M_O_eq = self.compute_Moles_eq(Moles=Moles, T_cmb=T_cmb)
-        epsilon = 0.1
+        epsilon = 1e-1
         near = 1-epsilon
-        dM_Mg_dT = self.logit((M_Mg-M_Mg_eq*near)/np.abs(M_Mg_eq)*100)*dM_Mg_dT
-        dM_Si_dT = self.logit((M_Si-M_Si_eq*near)/np.abs(M_Si_eq)*100)*dM_Si_dT
-        dM_O_dT = self.logit((M_O-M_O_eq*near)/np.abs(M_O_eq)*100)*dM_O_dT
+        A = 1e3
+        d = 0.5
+        dM_Mg_dT = self.logit((M_Mg-M_Mg_eq*near)/np.abs(M_Mg_eq)*A)*np.abs((M_Mg-M_Mg_eq)/np.abs(M_Mg_eq)+1)**d*dM_Mg_dT
+        dM_Si_dT = self.logit((M_Si-M_Si_eq*near)/np.abs(M_Si_eq)*A)*np.abs((M_Si-M_Si_eq)/np.abs(M_Si_eq)+1)**d*dM_Si_dT
+        dM_O_dT = self.logit((M_O-M_O_eq*near)/np.abs(M_O_eq)*A)*np.abs((M_O-M_O_eq)/np.abs(M_O_eq)+1)**d*dM_O_dT
 
         # mantle
         dM_MgO_dT = self.dM_MgO_dTc(Moles, dKs_dT, dMi_b)
