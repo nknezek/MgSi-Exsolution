@@ -377,4 +377,10 @@ class Custom(Stevenson):
         pm = self.params.mantle
         return self.planet.radiogenics.heat_production_mantle(pm.Hp, time)/self.volume
 
+    def get_dT0(self, T_cmb0):
+        m = 0.41431452
+        b = 182.04637097
+        return T_cmb0 * m + b
 
+    def get_Tum0(self, T_cmb0):
+        return T_cmb0 - self.get_dT0(T_cmb0)
