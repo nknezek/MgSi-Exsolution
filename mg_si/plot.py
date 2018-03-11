@@ -72,6 +72,59 @@ def coremoles(planet, times, solution, filepath='./', savename='coremoles.png', 
     if savename:
         plt.savefig(filepath + savename)
 
+def composition_wt(planet, times, solution, filepath='./', savename='composition_wt.png', N_approx=1000):
+    Nt = len(times)
+    di = int((len(times) - 1) // N_approx)
+    N = np.min((Nt // di, (Nt - 1) // di))
+    solution = solution[::di][:N]
+    times = times[::di][:N]
+
+    # T_cmb = solution[:, 0]
+    # T_um = solution[:, 1]
+    M_c, M_m = planet.reactions.unwrap_Moles(solution[:, 2:], return_sum=True, split_coremantle=True)
+    wt_mmass = np.expand_dims(np.array(planet.reactions.mantle.molmass),1)
+    wt = np.array(M_m)[:-1,:]*wt_mmass
+    wt_M_m =wt/np.sum(wt,0)
+    del wt_mmass,wt
+    wt_mmass = np.expand_dims(np.array(planet.reactions.core.molmass),1)
+    wt = np.array(M_c)[:-1,:]*wt_mmass
+    wt_M_c =wt/np.sum(wt,0)
+    t_plt = times / 3.16e7 / 1e9
+    names_c = planet.params.reactions.core.species
+    names_c.append('core')
+    names_m = planet.params.reactions.mantle.species
+    names_m.append('mantle')
+
+    plt.figure(figsize=(13, 4))
+    plt.subplot(121)
+    plt.title('Core Composition')
+    M0 = np.zeros(N)
+    for i in [0, 1, 3, 2]:
+        if i != 0:
+            M0 = M1
+        M1 = M0 + wt_M_c[i]
+        plt.fill_between(t_plt, M0*100., M1*100., label=names_c[i])
+    plt.legend(loc=0)
+    plt.ylim(0, 30)
+    plt.ylabel('wt %')
+    plt.xlabel('time (Byr)')
+    plt.grid()
+    plt.subplot(122)
+    plt.title('Mantle Layer Composition')
+    M0 = np.zeros(N)
+    for i in [0, 1, 2, 3, 4]:
+        if i != 0:
+            M0 = M1
+        M1 = M0 + wt_M_m[i]
+        plt.fill_between(t_plt, M0*100., M1*100., label=names_m[i])
+    plt.legend(loc=0)
+    plt.ylim(0, 100)
+    plt.ylabel('Wt %')
+    plt.xlabel('time (Byr)')
+    plt.grid()
+    if savename:
+        plt.savefig(filepath + savename)
+
 def composition(planet, times, solution, filepath='./', savename='composition.png', N_approx=1000):
     Nt = len(times)
     di = int((len(times) - 1) // N_approx)
