@@ -237,7 +237,7 @@ class Mantle_MgSi(Molar_Calculations):
         self.params.reactions.mantle.species = species
         super(Mantle_MgSi, self).__init__(species=species)
 
-    def compute_Mm_b(self, fraction_MgFe, X_MgFeO, X_SiO2, M_tot=None):
+    def compute_Mm_b(self, fraction_MgFe, X_MgFeO, X_SiO2,Kd_Pv_Fp,M_tot=None):
         ''' computes background mantle composition given Mg/(Mg+Fe) fraction, mol frac. ferropericlase, and mol frac. SiO2
 
         :param fraction_MgFe:
@@ -250,8 +250,11 @@ class Mantle_MgSi(Molar_Calculations):
         X_MgO = X_MgFeO*fraction_MgFe
         X_FeO = X_MgFeO*(1-fraction_MgFe)
         X_MgFeSiO3 = (1-X_SiO2-X_MgFeO)
-        X_MgSiO3 = X_MgFeSiO3*fraction_MgFe
-        X_FeSiO3 = X_MgFeSiO3*(1-fraction_MgFe)
+        Fe_Mg_MgFeO = 1/fraction_MgFe - 1
+        Fe_Mg_MgFeSiO3 = Fe_Mg_MgFeO*Kd_Pv_Fp
+        fraction_MgFe_Pv = 1/(Fe_Mg_MgFeSiO3+1)
+        X_MgSiO3 = X_MgFeSiO3*fraction_MgFe_Pv
+        X_FeSiO3 = X_MgFeSiO3*(1-fraction_MgFe_Pv)
         Xm = np.array([X_MgO, X_SiO2, X_FeO, X_MgSiO3, X_FeSiO3])
         pr.K_MgSiO3_b = X_MgO*X_SiO2/X_MgSiO3
         pr.K_FeSiO3_b = X_FeO*X_SiO2/X_FeSiO3

@@ -29,6 +29,7 @@ X_Si_0 = 0.01 # 0. - 0.05
 X_O_0 = 0.10  # 10. - 22.
 ## background mantle state
 fraction_MgFe_b = 0.8
+Kd_Pv_Fp = 0.4
 X_MgFeO_b = 0.16
 X_SiO2_b = 0.01
 ## Mantle viscosity
@@ -58,7 +59,7 @@ for nu_present in nus:  #[m^2/s]
                     X_Fe_0 = 1.-X_Mg_0-X_Si_0-X_O_0
                     wpms,wpss,wpfs,wpos = pl.reactions.core.X2wtp(np.array([X_Mg_0,X_Si_0,X_Fe_0,X_O_0]))
 
-                    Mm_b = pl.reactions.mantle.compute_Mm_b(fraction_MgFe_b, X_MgFeO_b, X_SiO2_b)
+                    Mm_b = pl.reactions.mantle.compute_Mm_b(fraction_MgFe_b, X_MgFeO_b, X_SiO2_b,Kd_Pv_Fp)
                     pl.params.reactions.Mm_b = Mm_b
 
                     T_present = 1350 # [K]
