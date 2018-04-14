@@ -17,9 +17,10 @@ overturn = 600 # Myr
 times = np.linspace(0,4568e6*365.25*24*3600,20000)
 
 ## background mantle state
-fraction_MgFe_b = 0.8
-X_MgFeO_b = 0.05
-X_SiO2_b = 0.01
+MgNumFp = 0.8
+MgNumPv = 0.93
+X_MgFeO_b = 0.311
+X_SiO2_b = 0.015
 ## Mantle viscosity
 pl = mg_si.planet.Custom()
 nu_present = 10**21/pl.params.mantle.rho #[m^2/s]
@@ -49,7 +50,7 @@ for T_cmb0 in T_cmbs:
                 x0 = x0+Moles_0
                 pl.params.reactions.Moles_0 = Moles_0
 
-                Mm_b = pl.reactions.mantle.compute_Mm_b(fraction_MgFe_b, X_MgFeO_b, X_SiO2_b)
+                Mm_b = pl.reactions.mantle.compute_Mm_b(X_MgFeO=X_MgFeO_b, X_SiO2=X_SiO2_b, MgNumFp=MgNumFp, MgNumPv=MgNumPv)
                 pl.params.reactions.Mm_b = Mm_b
 
                 T_present = 1350 # [K]
@@ -73,7 +74,7 @@ for T_cmb0 in T_cmbs:
                     plt.close('all')
                     time = str(datetime.datetime.now())
                     r_i = pl.core_layer.r_i(solution[-1,0], one_off=True)
-                    csvdata = [time, T_cmb0, deltaT0, r_i, X_Mg_0, X_Si_0, X_O_0, fraction_MgFe_b, X_MgFeO_b, X_SiO2_b, nu_present,layer_thickness,overturn]
+                    csvdata = [time, r_i, T_cmb0, X_Mg_0, X_Si_0, X_O_0, MgNumFp, MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present, deltaT0, layer_thickness, overturn]
                     print(csvdata)
                     with open(basefolder+'run_data{}.csv'.format(iT), 'a') as f:
                         writer = csv.writer(f)
@@ -85,7 +86,7 @@ for T_cmb0 in T_cmbs:
                     del pl
                     time = str(datetime.datetime.now())
                     r_i = np.nan
-                    csvdata = [time, T_cmb0, deltaT0, r_i, X_Mg_0, X_Si_0, X_O_0, fraction_MgFe_b, X_MgFeO_b, X_SiO2_b, nu_present,layer_thickness,overturn]
+                    csvdata = [time, r_i, T_cmb0, X_Mg_0, X_Si_0, X_O_0, MgNumFp, MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present, deltaT0, layer_thickness, overturn]
                     with open(basefolder+'run_data{}.csv'.format(iT), 'a') as f:
                         writer = csv.writer(f)
                         writer.writerow(csvdata)
