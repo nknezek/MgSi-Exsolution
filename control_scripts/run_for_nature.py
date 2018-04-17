@@ -41,11 +41,11 @@ for T_cmb0 in T_cmbs:
             for X_O_0 in X_Os:
                 print(T_cmb0, X_Si_0, X_Mg_0, X_O_0)
                 pl = mg_si.planet.Custom()
+                pl.reactions._set_layer_thickness(layer_thickness)
+                pl.reactions._set_overturn_time(overturn)
+                deltaT0 = pl.mantle_layer.get_dT0(T_cmb0)
+                T_um0 = T_cmb0-deltaT0
                 try:
-                    pl.reactions._set_layer_thickness(layer_thickness)
-                    pl.reactions._set_overturn_time(overturn)
-                    deltaT0 = pl.mantle_layer.get_dT0(T_cmb0)
-                    T_um0 = T_cmb0-deltaT0
                     Moles_0 = pl.reactions.compute_Moles_0(X_Mg_0, X_Si_0, X_O_0, T_cmb0)
                     x0 = [T_cmb0, T_um0]
                     x0 = x0+Moles_0
@@ -81,7 +81,6 @@ for T_cmb0 in T_cmbs:
                         writer.writerow(csvdata)
                     f.close()
                     del pl
-
                 except :
                     del pl
                     time = str(datetime.datetime.now())
@@ -92,5 +91,3 @@ for T_cmb0 in T_cmbs:
                         writer.writerow(csvdata)
                     f.close()
                 del csvdata,writer,f
-
-
