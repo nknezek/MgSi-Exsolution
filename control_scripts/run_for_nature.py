@@ -49,7 +49,7 @@ for T_cmb0 in T_cmbs:
 					filepath = basefolder+ "Tc{:.1f}_XM{:.3f}_XS{:.3f}_XO{:.3f}/".format(T_cmb0, X_Mg_0, X_Si_0, X_O_0)
 					if not os.path.exists(basefolder):
 						os.mkdir(basefolder)
-					if os.path.exists(filepath):
+					if os.path.exists(filepath+'data.m'):
 						print(filepath+' already computed')
 						continue
 					if not os.path.exists(filepath):
@@ -69,7 +69,6 @@ for T_cmb0 in T_cmbs:
 					A,nu0 = pl.mantle_layer.find_arrenhius_params(nu_present, T_present, nu_old, T_old, set_values=True)
 
 					solution = pl.integrate(times, x0)
-					print(filepath)
 					dill.dump((pl,times,solution), open(filepath+'data.m','wb'))
 					mplt.temperature(pl, times, solution, filepath=filepath)
 					mplt.coremoles(pl, times, solution, filepath=filepath)
@@ -78,7 +77,6 @@ for T_cmb0 in T_cmbs:
 					time = str(datetime.datetime.now())
 					r_i = pl.core_layer.r_i(solution[-1,0], one_off=True)
 					csvdata = [time, r_i, T_cmb0, X_Mg_0, X_Si_0, X_O_0, MgNumFp, MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present, deltaT0, layer_thickness, overturn]
-					print(csvdata)
 					with open(basefolder+'run_data{}.csv'.format(iT), 'a') as f:
 						writer = csv.writer(f)
 						writer.writerow(csvdata)
@@ -98,5 +96,6 @@ for T_cmb0 in T_cmbs:
 						del csvdata,writer,f
 					except:
 						print("couldn't do anything")
+
 
 
