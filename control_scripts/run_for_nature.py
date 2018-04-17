@@ -50,7 +50,7 @@ for T_cmb0 in T_cmbs:
 					if not os.path.exists(basefolder):
 						os.mkdir(basefolder)
 					if os.path.exists(filepath+'data.m'):
-						print(filepath+' already computed')
+						print('already computed')
 						continue
 					if not os.path.exists(filepath):
 						os.mkdir(filepath)
@@ -69,11 +69,11 @@ for T_cmb0 in T_cmbs:
 					A,nu0 = pl.mantle_layer.find_arrenhius_params(nu_present, T_present, nu_old, T_old, set_values=True)
 
 					solution = pl.integrate(times, x0)
-					dill.dump((pl,times,solution), open(filepath+'data.m','wb'))
 					mplt.temperature(pl, times, solution, filepath=filepath)
 					mplt.coremoles(pl, times, solution, filepath=filepath)
 					mplt.composition(pl, times, solution, filepath=filepath)
 					plt.close('all')
+					dill.dump((pl,times,solution), open(filepath+'data.m','wb'))
 					time = str(datetime.datetime.now())
 					r_i = pl.core_layer.r_i(solution[-1,0], one_off=True)
 					csvdata = [time, r_i, T_cmb0, X_Mg_0, X_Si_0, X_O_0, MgNumFp, MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present, deltaT0, layer_thickness, overturn]
@@ -82,22 +82,21 @@ for T_cmb0 in T_cmbs:
 						writer.writerow(csvdata)
 					f.close()
 					del pl
-					del csvdata,writer,f
-					print('finished computing '+filepath)
+					del csvdata
+					print('==== successfully finished computing')
 				except:
 					try:
 						del pl
 						time = str(datetime.datetime.now())
-						r_i = np.nan
+						r_i = 'nan'
 						csvdata = [time, r_i, T_cmb0, X_Mg_0, X_Si_0, X_O_0, MgNumFp, MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present, deltaT0, layer_thickness, overturn]
 						with open(basefolder+'run_data{}.csv'.format(iT), 'a') as f:
 							writer = csv.writer(f)
 							writer.writerow(csvdata)
 						f.close()
-						del csvdata,writer,f
-						print('problem with '+str(csvdata))
+						print('############## problem with '+str(csvdata)+'\n')
 					except:
-						print("couldn't do anything")
+						print("!!!!!!!!!!!!!!!!!!!!!!!\ncouldn't do anything\n!!!!!!!!!!!!!!!!!\n")
 
 
 
