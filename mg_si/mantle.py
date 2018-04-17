@@ -15,6 +15,7 @@ class Stevenson(MantleLayer):
         pm = self.params.mantle
         pm.R_p0 = 6371e3  # - [m] from Stevenson 1983 Table II
         pm.R_c0 = 3485e3  # - [m] from Stevenson 1983 pg. 474
+        # pm.T_s = 293.  # - [K] from Stevenson 1983 Table II
         pm.T_s = 293.  # - [K] from Stevenson 1983 Table II
         pm.mu = 1.3 # - [] from Stevenson 1983 pg. 473 and Table II
         pm.alpha = 2e-5 # - [/K] from Stevenson 1983 Table I
@@ -141,7 +142,7 @@ class Stevenson(MantleLayer):
         upper_boundary_layer_thickness = self.upper_boundary_layer_thickness(T_mantle_bottom, T_upper_mantle)
         return pm.k * delta_T / upper_boundary_layer_thickness
 
-    def lower_boundary_flux(self, T_mantle_bottom, T_upper_mantle):
+    def lower_boundary_flux(self, T_mantle_bottom, T_upper_mantle,time=None):
         '''
         Equation (17) from Stevenson et al 1983
 
@@ -149,10 +150,14 @@ class Stevenson(MantleLayer):
         :param T_mantle_bottom:
         :return:
         '''
+        factor = 1
+        # if time is not None :
+        #     factor = (1.+0.01*np.sin(time*2*np.pi/2000/3e7))
+        #     print(factor)
         pm = self.params.mantle
         delta_T = T_mantle_bottom - self.lower_mantle_temperature(T_upper_mantle)
         lower_boundary_layer_thickness = self.lower_boundary_layer_thickness(T_mantle_bottom, T_upper_mantle)
-        return pm.k * delta_T / lower_boundary_layer_thickness
+        return pm.k * delta_T*factor / lower_boundary_layer_thickness
 
     def energy_balance(self, T_mantle_bottom, T_upper_mantle, time, verbose=False):
         if verbose:
@@ -163,7 +168,7 @@ class Stevenson(MantleLayer):
 
         effective_heat_capacity =  pm.rho * pm.C * pm.mu * self.volume
         internal_heat_energy = self.heat_production(time) * self.volume
-        cmb_flux = self.lower_boundary_flux(T_mantle_bottom, T_upper_mantle)
+        cmb_flux = self.lower_boundary_flux(T_mantle_bottom, T_upper_mantle,time=time)
         surface_flux = self.upper_boundary_flux(T_mantle_bottom, T_upper_mantle)
         net_flux_out = mantle_surface_area * surface_flux - core_surface_area * cmb_flux
         dTdt = (internal_heat_energy - net_flux_out) / effective_heat_capacity

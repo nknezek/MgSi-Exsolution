@@ -657,7 +657,7 @@ class MgSi():
         X_MgO = X_Mg * X_O / K4
         X_FeO = X_Fe * X_O / K5
         X_SiO2 = X_Si * X_O ** 2 / K6
-        X_FeSiO3 = (1 - X_MgO - X_FeO - X_SiO2) / (1 + X_MgO / X_FeO)
+        X_FeSiO3 = (1 - X_MgO - X_FeO - X_SiO2) / (1 + X_MgO / X_FeO)  ### THIS NEEDS TO BE CHANGED -- SEE THE STUFF ABOVE FOR BCKG Mantle
         X_MgSiO3 = 1 - X_MgO - X_FeO - X_SiO2 - X_FeSiO3
         X_m = np.array([X_MgO, X_SiO2, X_FeO, X_MgSiO3, X_FeSiO3])
         M_m = self.mantle.X2M(X_m, wt_tot=pr.mass_l_0)

@@ -1164,7 +1164,12 @@ class Custom(Nimmo):
         pc.alpha_cf = 0.28 # [-] coefficient of compositional expansion for FeO (guess) - Hard shell estimate
         pc.L_Hm = 910e3 # [J/kg] latent heat for MgO exsolution (guess)
         pc.L_Hs = 4300e3 # [J/kg] latent heat for SiO2 exsolution [Hirose et al. 2017]
-        pc.L_Hf = 910e3 # [J/kg] latent heat for FeO exsolution (guess)
+        pc.L_Hf = 686e3 # [J/kg] latent heat for FeO exsolution
+        # (from Jackie Li's calc  -Tdel_S = Tdel_V/(dT/dP);
+        # 2% density difference between solid and liquid, with the melting curve of Anzellini 2013) (dT/dP - 12.5 K/GPa),
+        #  density of iron similar to Earth's density at ICB (13 g/cc),
+        #  and T_ICB = 5500 K
+
 
     def reset_current_values(self):
         '''
