@@ -83,6 +83,7 @@ for T_cmb0 in T_cmbs:
 					f.close()
 					del pl
 					del csvdata,writer,f
+					print('finished computing '+filepath)
 				except:
 					try:
 						del pl
@@ -94,6 +95,7 @@ for T_cmb0 in T_cmbs:
 							writer.writerow(csvdata)
 						f.close()
 						del csvdata,writer,f
+						print('problem with '+str(csvdata))
 					except:
 						print("couldn't do anything")
 
