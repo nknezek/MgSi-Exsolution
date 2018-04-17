@@ -41,24 +41,24 @@ for T_cmb0 in T_cmbs:
             for X_O_0 in X_Os:
                 print(T_cmb0, X_Si_0, X_Mg_0, X_O_0)
                 pl = mg_si.planet.Custom()
-                pl.reactions._set_layer_thickness(layer_thickness)
-                pl.reactions._set_overturn_time(overturn)
-                deltaT0 = pl.mantle_layer.get_dT0(T_cmb0)
-                T_um0 = T_cmb0-deltaT0
-                Moles_0 = pl.reactions.compute_Moles_0(X_Mg_0, X_Si_0, X_O_0, T_cmb0)
-                x0 = [T_cmb0, T_um0]
-                x0 = x0+Moles_0
-                pl.params.reactions.Moles_0 = Moles_0
+                try:
+                    pl.reactions._set_layer_thickness(layer_thickness)
+                    pl.reactions._set_overturn_time(overturn)
+                    deltaT0 = pl.mantle_layer.get_dT0(T_cmb0)
+                    T_um0 = T_cmb0-deltaT0
+                    Moles_0 = pl.reactions.compute_Moles_0(X_Mg_0, X_Si_0, X_O_0, T_cmb0)
+                    x0 = [T_cmb0, T_um0]
+                    x0 = x0+Moles_0
+                    pl.params.reactions.Moles_0 = Moles_0
 
-                Mm_b = pl.reactions.mantle.compute_Mm_b(X_MgFeO=X_MgFeO_b, X_SiO2=X_SiO2_b, MgNumFp=MgNumFp, MgNumPv=MgNumPv)
-                pl.params.reactions.Mm_b = Mm_b
+                    Mm_b = pl.reactions.mantle.compute_Mm_b(X_MgFeO=X_MgFeO_b, X_SiO2=X_SiO2_b, MgNumFp=MgNumFp, MgNumPv=MgNumPv)
+                    pl.params.reactions.Mm_b = Mm_b
 
-                T_present = 1350 # [K]
-                nu_old =  nu_present/1e3
-                T_old = T_um0
-                A,nu0 = pl.mantle_layer.find_arrenhius_params(nu_present, T_present, nu_old, T_old, set_values=True)
+                    T_present = 1350 # [K]
+                    nu_old =  nu_present/1e3
+                    T_old = T_um0
+                    A,nu0 = pl.mantle_layer.find_arrenhius_params(nu_present, T_present, nu_old, T_old, set_values=True)
 
-                try :
                     solution = pl.integrate(times, x0)
                     filepath = basefolder+ "Tc{:.1f}_XM{:.3f}_XS{:.3f}_XO{:.3f}/".format(T_cmb0, X_Mg_0, X_Si_0, X_O_0)
                     if not os.path.exists(basefolder):

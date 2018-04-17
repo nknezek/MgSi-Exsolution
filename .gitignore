@@ -1,3 +1,7 @@
+# Project data files
+computed_solutions_nature/T*
+.idea
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
