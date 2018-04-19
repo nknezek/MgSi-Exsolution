@@ -3,7 +3,7 @@ import os
 
 names = np.array(['time', 'T_cmb0', 'T_um0', 'r_i', 'wpms','wpss','wpos', 'fraction_MgFe_b', 'X_MgFeO_b','X_SiO2_b', 'nu_present','layer_thickness','overturn','X_Mg_0', 'X_Si_0', 'X_O_0'])
 data = pd.read_csv('run_data_200.csv', names = names)
-data['ratio_ri'] = data['r_i']/1290./1e3
+data['ratio_ri'] = data['r_i']/1220./1e3
 
 tmp1 = np.where(( data['ratio_ri'] <1.1) & ( data['ratio_ri'] > 0.9)) 
 

@@ -1159,12 +1159,18 @@ class Custom(Nimmo):
         # pc.L_Hm = 0. # [J/kg] latent heat for MgO exsolution (guess)
         # pc.L_Hs = 0. # [J/kg] latent heat for SiO2 exsolution [Hirose et al. 2017]
         # pc.L_Hf = 0. # [J/kg] latent heat for FeO exsolution (guess)
-        pc.alpha_cm = 0.84 # [-] coefficient of compositional expansion for MgO [O'Rourke, Korenaga 2016]  - Hard shell estimate
-        pc.alpha_cs = 1.117 # [-] coefficient of compositional expansion for SiO2 [Hirose et al. 2017]
-        pc.alpha_cf = 0.28 # [-] coefficient of compositional expansion for FeO (guess) - Hard shell estimate
-        pc.L_Hm = 910e3 # [J/kg] latent heat for MgO exsolution (guess)
-        pc.L_Hs = 4300e3 # [J/kg] latent heat for SiO2 exsolution [Hirose et al. 2017]
-        pc.L_Hf = 910e3 # [J/kg] latent heat for FeO exsolution (guess)
+        # pc.alpha_cm = 0.84 # [-] coefficient of compositional expansion for MgO [O'Rourke, Korenaga 2016]  - Hard shell estimate
+        # pc.alpha_cs = 1.117 # [-] coefficient of compositional expansion for SiO2 [Hirose et al. 2017]
+        # pc.alpha_cf = 0.28 # [-] coefficient of compositional expansion for FeO (guess) - Hard shell estimate
+        # pc.L_Hm = 910e3 # [J/kg] latent heat for MgO exsolution (guess)
+        # pc.L_Hs = 4300e3 # [J/kg] latent heat for SiO2 exsolution [Hirose et al. 2017]
+        # pc.L_Hf = 910e3 # [J/kg] latent heat for FeO exsolution (guess)
+        pc.alpha_cm = 0.89  # [-] coefficient of compositional expansion for MgO  - Hard shell estimate
+        pc.alpha_cs = 1.117  # [-] coefficient of compositional expansion for SiO2 [Hirose et al. 2017]
+        pc.alpha_cf = 0.6  # [-] coefficient of compositional expansion for FeO - Estimate from Jackie based on FeO Fe density difference
+        pc.L_Hm = 9005e3  # [J/kg] latent heat for MgO exsolution (guess)
+        pc.L_Hs = 4307e3  # [J/kg] latent heat for SiO2 exsolution [Hirose et al. 2017]
+        pc.L_Hf = 1010e3  # [J/kg] latent heat for FeO exsolution (guess)
 
     def reset_current_values(self):
         '''
