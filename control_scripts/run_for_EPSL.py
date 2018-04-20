@@ -46,15 +46,15 @@ for nu_present in nus :
                     pl.reactions._set_overturn_time(overturn)
                     deltaT0 = pl.mantle_layer.get_dT0(T_cmb0)
                     T_um0 = T_cmb0-deltaT0
-    				try:
+                    try:
                         filepath = basefolder+ "Tc{:.1f}_XM{:.3f}_XS{:.3f}_XO{:.3f}_fFp{:.2f}_fPv{:.2f}_XMgFe{:.2f}_XSb{:.2f}_nu{:.0e}_lthck{:.0e}_ovt{:.0e}/".format(T_cmb0, X_Mg_0, X_Si_0, X_O_0,MgNumFp,MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present,layer_thickness,overturn)
-    					if not os.path.exists(basefolder):
-    						os.mkdir(basefolder)
-    					if os.path.exists(filepath+'data.m'):
-    						print('already computed')
-    						continue
-    					if not os.path.exists(filepath):
-    						os.mkdir(filepath)
+                        if not os.path.exists(basefolder):
+                            os.mkdir(basefolder)
+                        if os.path.exists(filepath+'data.m'):
+                            print('already computed')
+                            continue
+                        if not os.path.exists(filepath):
+                            os.mkdir(filepath)
 
                         Moles_0 = pl.reactions.compute_Moles_0(X_Mg_0, X_Si_0, X_O_0, T_cmb0)
                         x0 = [T_cmb0, T_um0]
@@ -85,19 +85,19 @@ for nu_present in nus :
                         f.close()
                         copyfile('./dynamo_power.py',filepath+'dynamo_power.py')
                         del pl
-    					del csvdata
-    					print('==== successfully finished computing')
+                        del csvdata
+                        print('==== successfully finished computing')
                     except :
-    					try:
-    						del pl
-    						time = str(datetime.datetime.now())
-    						r_i = 'nan'
-    						csvdata = [time, r_i, T_cmb0, X_Mg_0, X_Si_0, X_O_0, MgNumFp, MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present, deltaT0, layer_thickness, overturn]
-    						with open(basefolder+'run_data{}.csv'.format(iT), 'a') as f:
-    							writer = csv.writer(f)
-    							writer.writerow(csvdata)
-    						f.close()
-    						print('############## problem with '+str(csvdata)+'\n')
-    					except:
-    						print("!!!!!!!!!!!!!!!!!!!!!!!\ncouldn't do anything\n!!!!!!!!!!!!!!!!!\n")
+                        try:
+                            del pl
+                            time = str(datetime.datetime.now())
+                            r_i = 'nan'
+                            csvdata = [time, r_i, T_cmb0, X_Mg_0, X_Si_0, X_O_0, MgNumFp, MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present, deltaT0, layer_thickness, overturn]
+                            with open(basefolder+'run_data{}.csv'.format(iT), 'a') as f:
+                                writer = csv.writer(f)
+                                writer.writerow(csvdata)
+                            f.close()
+                            print('############## problem with '+str(csvdata)+'\n')
+                        except:
+                            print("!!!!!!!!!!!!!!!!!!!!!!!\ncouldn't do anything\n!!!!!!!!!!!!!!!!!\n")
 print('All Done ! - Yay : ',iT)
