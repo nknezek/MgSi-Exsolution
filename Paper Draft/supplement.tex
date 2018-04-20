@@ -2,116 +2,112 @@
 \usepackage{amssymb,amsmath}
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{natbib}
+\bibliographystyle{plainnat}
 
 \date{}
 \title{MgSi Paper Supplement}
 
 \begin{document}
+	
+	\maketitle
+	\section{Methods}\label{methods}
+	
+	
+	\subsection{Equilibrium Reactions}\label{equilibrium-reactions}
+	We cast the equilibrium reaction equations in terms of total moles for ease of computation. We assume that all activities are equal to one in our formation, which gives
+	\begin{align}
+	K_{1} &= \frac{a_{Mg}a_{O}}{ a_{MgO}} = \frac{X_{Mg} X_O }{X_{MgO}} = \frac{M_{Mg}M_{O}M_m}{M_{MgO}M_c^2}\\
+	K_{2} &= \frac{a_{Si}a_{O}^2}{ a_{SiO_2}} = \frac{X_{Si} X_O^2 }{X_{SiO_2}} = \frac{M_{Si}M_{O}^2M_m}{M_{SiO_2}M_c^3}\\
+	K_{3} &= \frac{a_{Fe}a_{O}}{ a_{FeO}} = \frac{X_{Fe} X_O }{X_{FeO}} = \frac{M_{Fe}M_{O}M_m}{M_{FeO}M_c^2}\\
+	K_{4} &= \frac{a_{MgO}a_{SiO_2}}{ a_{MgSiO_3}} = \frac{X_{MgO} X_{SiO_2} }{X_{MgSiO_3}} = \frac{M_{MgO}M_{SiO_2}}{M_{MgSiO_3}M_m}​\\
+	K_{5} &= \frac{a_{FeO}a_{SiO_2}}{ a_{FeSiO_3}} = \frac{X_{FeO} X_{SiO_2} }{X_{FeSiO_3}} = \frac{M_{FeO}M_{SiO_2}}{M_{FeSiO_3}M_m}
+	\end{align}
+	where $M_c$ and $M_m$ are the total moles in the core and mantle interaction layer. 
+	
+	Then, to compute the change in equilibrium, we take the derivative of each equation with respect to temperature, which gives
+	\begin{align}
+	\frac{(\partial_T K_1)}{K_1} &= \frac{(\partial_T M_{Mg})}{M_{Mg}} + \frac{(\partial_T M_{O})}{M_{O}} + \frac{(\partial_T M_{m})}{M_{m}} - \frac{2(\partial_T M_{c})}{M_{c}} - \frac{(\partial_T M_{MgO})}{M_{MgO}}
+	\\
+	\frac{1}{K_2}\partial_T K_2 &= \frac{1}{M_{Si}}\partial_T M_{Si} +
+	\frac{2}{M_{O}}\partial_T M_{O} + \frac{1}{M_{m}}\partial_T M_{m} -
+	\frac{3}{M_{c}}\partial_T M_{c} -
+	\frac{1}{M_{SiO_2}}\partial_T M_{SiO_2} \\
+	\frac{1}{K_3}\partial_T K_3 &= \frac{1}{M_{Fe}}\partial_T M_{Fe} +\frac{1}{M_{O}}\partial_T M_{O} +\frac{1}{M_{m}}\partial_T M_{m}-\frac{2}{M_{c}}\partial_T M_{c} - \frac{1}{M_{FeO}}\partial_T M_{FeO}\\
+	\frac{1}{K_4}\partial_T K_4 &= \frac{1}{M_{MgO}}\partial_T M_{MgO} +\frac{1}{M_{SiO_2}}\partial_T M_{SiO_2} -\frac{1}{M_{MgSiO_3}}\partial_T M_{MgSiO_3} -\frac{1}{M_{m}}\partial_T M_{m} \\
+	\frac{1}{K_5}\partial_T K_5 &= \frac{1}{M_{FeO}}\partial_T M_{FeO} +
+	\frac{1}{M_{SiO_2}}\partial_T M_{SiO_2} -
+	\frac{1}{M_{FeSiO_3}}\partial_T M_{FeSiO_3} -
+	\frac{1}{M_{m}}\partial_T M_{m} \, .
+	\end{align}
+	We have analytical expressions for how the equilibrium constants $K_i$ vary with temperature, so the independent variables in this system consist of the nine $M_i$ species and two total values $M_c$ and $M_m$. We wish to solve this system to obtain a set of first-order coupled ODEs. Therefore, with eleven variables and five equations, we need six more constraints. Four constraints are provided by maintaining the total number of moles of each atomic species between the core, interaction layer, and exchange with the background mantle:
+	\begin{align}
+	0 &= \partial_T M_{Mg} + \partial_T M_{MgO} + \partial_T M_{MgSiO_3} + \left(\partial_T M_{MgO}\right)_{erosion} + \left(\partial_T M_{MgSiO_3}\right)_{erosion} \\
+	0 &= \partial_T M_{Si} + \partial_T M_{SiO_2} + \partial_T M_{MgSiO_3} + \partial_T M_{FeSiO_3} + \left(\partial_T M_{SiO_2}\right)_{erosion} +\left(\partial_T M_{MgSiO_3}\right)_{erosion} +\left(\partial_T M_{FeSiO_3}\right)_{erosion}\\
+	0 &= \partial_T M_{Fe} + \partial_T M_{FeO} + \partial_T M_{FeSiO_3} + \left(\partial_T M_{FeO}\right)_{erosion} + \left(\partial_T M_{FeSiO_3}\right)_{erosion}\\
+	0 &= \partial_T M_{O}+\partial_T M_{MgO}+ \partial_T M_{FeO} +2\partial_T M_{SiO_2} + 3\partial_T M_{MgSiO_3} + 3\partial_T M_{FeSiO_3} +\left(\partial_T M_{MgO}\right)_{erosion} +\left(\partial_T M_{FeO}\right)_{erosion} +2\left(\partial_T M_{SiO2}\right)_{erosion} +3\left(\partial_T M_{MgSiO_3}\right)_{erosion} +3\left(\partial_T M_{FeSiO_3}\right)_{erosion} \,.
+	\end{align}
+	Then, the final two constraints are provided by ensuring mass continuity in the core and mantle
+	\begin{align}
+	0 &=\partial_T M_{c}+ \partial_T M_{Mg}+ \partial_T M_{Fe} +\partial_T M_{Si} + \partial_T M_{O}\\
+	0 &= \partial_T M_{m}+ \partial_T M_{MgO}+ \partial_T M_{FeO} +\partial_T M_{SiO_2} + \partial_T M_{MgSiO_3} + \partial_T M_{FeSiO_3} +\left(\partial_T M_{MgO}\right)_{erosion} +\left(\partial_T M_{FeO}\right)_{erosion} +\left(\partial_T M_{SiO2}\right)_{erosion} +\left(\partial_T M_{MgSiO_3}\right)_{erosion} +\left(\partial_T M_{FeSiO_3}\right)_{erosion} \,.
+	\end{align}
 
-\maketitle
-
-\section{Equilibrium Reactions}\label{equilibrium-reactions}
-
-\begin{align}
-K_{1} &= \frac{a_{Mg}a_{O}}{ a_{MgO}} = \frac{X_{Mg} X_O }{X_{MgO}} = \frac{M_{Mg}M_{O}M_m}{M_{MgO}M_c^2}\\
-K_{2} &= \frac{a_{Si}a_{O}^2}{ a_{SiO_2}} = \frac{X_{Si} X_O^2 }{X_{SiO_2}} = \frac{M_{Si}M_{O}^2M_m}{M_{SiO_2}M_c^3}\\
-K_{3} &= \frac{a_{Fe}a_{O}}{ a_{FeO}} = \frac{X_{Fe} X_O }{X_{FeO}} = \frac{M_{Fe}M_{O}M_m}{M_{FeO}M_c^2}\\
-K_{4} &= \frac{a_{MgO}a_{SiO_2}}{ a_{MgSiO_3}} = \frac{X_{MgO} X_{SiO_2} }{X_{MgSiO_3}} = \frac{M_{MgO}M_{SiO_2}}{M_{MgSiO_3}M_m}​\\
-K_{5} &= \frac{a_{FeO}a_{SiO_2}}{ a_{FeSiO_3}} = \frac{X_{FeO} X_{SiO_2} }{X_{FeSiO_3}} = \frac{M_{FeO}M_{SiO_2}}{M_{FeSiO_3}M_m}
-\end{align}
-
-\subsection{Change with Temperature}\label{change-with-temperature}
-\begin{align}
-\frac{(\partial_T K_1)}{K_1} &= \frac{(\partial_T M_{Mg})}{M_{Mg}} + \frac{(\partial_T M_{O})}{M_{O}} + \frac{(\partial_T M_{m})}{M_{m}} - \frac{2(\partial_T M_{c})}{M_{c}} - \frac{(\partial_T M_{MgO})}{M_{MgO}}
-\\
-\frac{1}{K_2}\partial_T K_2 &= \frac{1}{M_{Si}}\partial_T M_{Si} +
-\frac{2}{M_{O}}\partial_T M_{O} + \frac{1}{M_{m}}\partial_T M_{m} -
-\frac{3}{M_{c}}\partial_T M_{c} -
-\frac{1}{M_{SiO_2}}\partial_T M_{SiO_2} \\
-\frac{1}{K_3}\partial_T K_3 &= \frac{1}{M_{Fe}}\partial_T M_{Fe} +\frac{1}{M_{O}}\partial_T M_{O} +\frac{1}{M_{m}}\partial_T M_{m}-\frac{2}{M_{c}}\partial_T M_{c} - \frac{1}{M_{FeO}}\partial_T M_{FeO}\\
-\frac{1}{K_4}\partial_T K_4 &= \frac{1}{M_{MgO}}\partial_T M_{MgO} +\frac{1}{M_{SiO_2}}\partial_T M_{SiO_2} -\frac{1}{M_{MgSiO_3}}\partial_T M_{MgSiO_3} -\frac{1}{M_{m}}\partial_T M_{m} \\
-\frac{1}{K_5}\partial_T K_5 &= \frac{1}{M_{FeO}}\partial_T M_{FeO} +
-\frac{1}{M_{SiO_2}}\partial_T M_{SiO_2} -
-\frac{1}{M_{FeSiO_3}}\partial_T M_{FeSiO_3} -
-\frac{1}{M_{m}}\partial_T M_{m} \\
-\end{align}
-
-
-\subsection{Molar Continuity}\label{molar-continuity}
-\begin{align}
-0 &= \partial_T M_{Mg} + \partial_T M_{MgO} + \partial_T M_{MgSiO_3} + \left(\partial_T M_{MgO}\right)_{erosion} + \left(\partial_T M_{MgSiO_3}\right)_{erosion} \\
-0 &= \partial_T M_{Si} + \partial_T M_{SiO_2} + \partial_T M_{MgSiO_3} + \partial_T M_{FeSiO_3} + \left(\partial_T M_{SiO_2}\right)_{erosion} +\left(\partial_T M_{MgSiO_3}\right)_{erosion} +\left(\partial_T M_{FeSiO_3}\right)_{erosion}\\
-0 &= \partial_T M_{Fe} + \partial_T M_{FeO} + \partial_T M_{FeSiO_3} + \left(\partial_T M_{FeO}\right)_{erosion} + \left(\partial_T M_{FeSiO_3}\right)_{erosion}\\
-0 &= \partial_T M_{O}+\partial_T M_{MgO}+ \partial_T M_{FeO} +2\partial_T M_{SiO_2} + 3\partial_T M_{MgSiO_3} + 3\partial_T M_{FeSiO_3} +\left(\partial_T M_{MgO}\right)_{erosion} +\left(\partial_T M_{FeO}\right)_{erosion} +2\left(\partial_T M_{SiO2}\right)_{erosion} +3\left(\partial_T M_{MgSiO_3}\right)_{erosion} +3\left(\partial_T M_{FeSiO_3}\right)_{erosion}\\
-0 &= \partial_T M_{m}+ \partial_T M_{MgO}+ \partial_T M_{FeO} +\partial_T M_{SiO_2} + \partial_T M_{MgSiO_3} + \partial_T M_{FeSiO_3} +\left(\partial_T M_{MgO}\right)_{erosion} +\left(\partial_T M_{FeO}\right)_{erosion} +\left(\partial_T M_{SiO2}\right)_{erosion} +\left(\partial_T M_{MgSiO_3}\right)_{erosion} +\left(\partial_T M_{FeSiO_3}\right)_{erosion}\\
-0 &=\partial_T M_{c}+ \partial_T M_{Mg}+ \partial_T M_{Fe} +\partial_T M_{Si} + \partial_T M_{O} \\
-\end{align}
-
-
-\subsection{Erosion Term}\label{erosion-term}
-\begin{equation}
-\left(\partial_t M_i\right)_{erosion}=\frac{sgn(M_{b,i}-M_i)}{\tau}[(|M_i / M_{b,i}-1|+1)^2-1]
-\end{equation}
-\begin{equation}
-\left(\partial_T M_i\right)_{erosion} = \left(\partial_t M_i\right)_{erosion} / \frac{T_c}{dt}
-\end{equation}
-
-
-\subsection{Solution} \label{solution}
-
-With total moles in the mantle \(M_m\) and core \(M_c\), There are
-eleven components \(M_i\) in the system and eleven equations. This
-system is solved to obtain a system of first-order nonlinear ODEs of the
-form \(\partial_T M_i = f(M_i, K_j)\) where \(M_i\) represent each
-molar species in the mantle and core and \(K_j\) is each equilibrium
-value. Due to the highly non-linear nature of this set of equations,
-this results in the solution including several thousand terms each.
-Further simplification of the equations may be possible, but there is no
-significant performance penalty so it was not considered a problem. Note
-that \(K_j =K_j(T_c)\)is an analytic function of temperature.
-
-
-\section{Coupled Thermo-Chemical Evolution} \label{coupled-thermo-chemical-evolution}
-
-The chemical reactions are incorporated into the core-mantle thermal
-evolution model. With two temperatures \(T_{CMB}\) and \(T_{UM}\), and
-nine molar species, this creates and eleven-component state vector
-\(\mathbf{x}\). At each timestep, the mantle uses \(T_{CMB}\) and
-\(T_{UM}\) to compute a heat flux at the surface and core-mantle
-boundary and uses this to compute \(\partial_t T_{UM}\). Then, the
-system of chemical reaction equations uses the current \(T_{CMB}\) and
-molar concentrations \(M_i\) to compute \(\partial_T M_i\). The core
-uses \(Q_{CMB}\) from the mantle and \(\partial_T M_i\) from exsolution
-of light elements to compute \(\partial_t T_{CMB}\). Finally, this
-change in temperature is used to compute the change in molar
-concentrations with time by
-\(\partial_t M_i = \partial_T M_i \partial_t T_{CMB}\). This allows
-for the computation of \(\partial_t \mathbf{x}\) at any state.
-
-We compute the heat release with change in CMB temperature using
-\(\tilde{Q}_{g,i} \partial_t T_c = Q_{g,i}\) where \(\tilde{Q}_{g,i}\)
-depends upon the change in wt\% of the light element with temperature
-(see Nimmo 2015 eq. 73). This is easily computed given
-\(\partial_T M_i\). Then, we include these in addition to the
-inner-core and secular cooling terms to obtain
-\(\tilde{Q}_T = \tilde{Q}_s+\tilde{Q}_g+\tilde{Q}_L +\tilde{Q}_{g,MgO}+\tilde{Q}_{g,FeO}+\tilde{Q}_{g,SiO2}+\tilde{Q}_{L,MgO}+\tilde{Q}_{L,FeO}+\tilde{Q}_{L,SiO2}\)
-
-which is used the the calculation of the core energy budget (see Nimmo
-2015 eq. 73).
-
-In a similar manner, we modify the expression for entropy in the core by
-including terms for exsolution of light elements
-\(\tilde{E}_T = \tilde{E}_s+\tilde{E}_g+\tilde{E}_L+\tilde{E}_H +\tilde{E}_{g,MgO}+\tilde{E}_{g,FeO}+\tilde{E}_{g,SiO2}\)
-
-(see Nimmo 2015, eq. 72). As noted in the main text, we do not allow
-light elements to diffuse into the core because they would form a thin
-stratified layer and fail to mix into the bulk core. We implement this
-by requiring that \(\partial_t M_i \le 0\) for i=Mg,Si,O. We do allow
-Fe to diffuse into the core, but this happens only rarely as a result of
-changing mantle composition due to mantle overturn in our models and
-must be matched by exsolution of light elements. Oxygen cannot diffuse
-into the core and therefore the O concentration cannot increase, which
-requires that any FeO entering the core be matched by MgO or SiO2
-pulling Oxygen out at the same or faster rate.
-
+	\subsection{Interaction Layer Erosion}
+	As detailed in the main text, this layer is removed and replaced with fresh background mantle on a timescale $\tau$ governed by mantle convection. To model this, we create an empirical function that pushes the mantle interaction layer composition towards the background mantle composition on a timescale governed by $\tau$:
+	\begin{equation}
+	\left(\partial_t M_i\right)_{erosion}=\frac{sgn(M_{i,b}-M_i)}{\tau}[(|M_i / M_{i,b}-1|+1)^2-1] \,.
+	\end{equation}
+	In the absence of continued exsolution, this expression returns the layer composition to the background mantle composition on the timescale $\tau$ of mantle convection. For incorporation into the above equations, the derivative with respect to time must be converted to a derivative with respect to temperature
+	\begin{equation}
+	\left(\partial_T M_i\right)_{erosion} = \frac{\left(\partial_t M_i\right)_{erosion}}{ \tfrac{dT_c}{dt}} 
+	\end{equation}
+	where $\tfrac{dT_c}{dt}$ is simply the change in temperature at the CMB.
+	
+	\subsection{Equilibrium Constants}
+	We use data from \citet{Badro2016}, and \citet{Hirose2017} to compute equilibrium constants in our model. For eq (1-3) we compute equilibrium constants using the form
+	\begin{equation}\label{eq:K}
+	K_i(T) = 10^{a+b/T} ,\qquad \partial_T K_i(T) = \tfrac{b}{T} 10^{a+b/T}
+	\end{equation}
+	TUSHAR TODO
+	We find that computing the full expression given in \citet{Hirose2017} introduces numerical instabilities in our model due to the changing silicon and oxygen content in our core. Therefore, we choose to use the functional form \eqref{eq:K} while modifying the reported fit values to more accurately fit the reported experimental outcomes. 
+	
+	\subsection{First-Order ODE System} \label{solution}
+	
+	With total moles in the mantle \(M_m\) and core \(M_c\), There are
+	eleven components \(M_i\) in the system and eleven equations. This
+	system is solved to obtain a system of first-order nonlinear ODEs of the
+	form 
+	$$\partial_T M_i = f(M_i, K_j, \partial_T K_j)$$
+	where \(M_i\) represents each molar species in the mantle and core and \(K_j\) is each equilibrium constant. Due to the highly non-linear nature of this set of equations, each equation has several thousand terms. Further simplification of the equations may be possible to reduce the number of terms, but there is no significant performance penalty when computing the system so it was not considered necessary. 
+	
+	\section{Coupled Thermo-Chemical Evolution} \label{coupled-thermo-chemical-evolution}
+	
+	The chemical reactions are incorporated into the core-mantle thermal
+	evolution model. With two temperatures \(T_{CMB}\) and \(T_{UM}\), and
+	nine molar species, this creates and eleven-component state vector
+	\(\mathbf{x}\). At each timestep, the mantle uses \(T_{CMB}\) and
+	\(T_{UM}\) to compute a heat flux at the surface and core-mantle
+	boundary and uses this to compute \(\partial_t T_{UM}\). Then, the
+	system of chemical reaction equations uses the current \(T_{CMB}\) and
+	molar concentrations \(M_i\) to compute \(\partial_T M_i\). The core
+	uses \(Q_{CMB}\) from the mantle and \(\partial_T M_i\) from exsolution
+	of light elements to compute \(\partial_t T_{CMB}\). Finally, this
+	change in temperature is used to compute the change in molar
+	concentrations with time by
+	\(\partial_t M_i = \partial_T M_i \partial_t T_{CMB}\). This allows
+	for the computation of \(\partial_t \mathbf{x}\) at any state.
+	
+	We compute the heat release with change in CMB temperature using
+	$$\tilde{Q}_{g,i} \partial_t T_c = Q_{g,i}$$ 
+	where \(\tilde{Q}_{g,i}\) depends upon the change in wt\% of the light element with temperature (see Nimmo 2015 eq. 73). This is easily computed given \(\partial_T M_i\). Then, we include these in addition to the inner-core and secular cooling terms to obtain
+	$$\tilde{Q}_T = \tilde{Q}_s+\tilde{Q}_g+\tilde{Q}_L +\tilde{Q}_{g,MgO}+\tilde{Q}_{g,FeO}+\tilde{Q}_{g,SiO2}+\tilde{Q}_{L,MgO}+\tilde{Q}_{L,FeO}+\tilde{Q}_{L,SiO2}$$
+	which is used the the calculation of the core energy budget (see Nimmo
+	2015 eq. 73). We modify the expression for entropy in the core in a similar manner, including terms for exsolution of light elements
+	$$\tilde{E}_T = \tilde{E}_s+\tilde{E}_g+\tilde{E}_L+\tilde{E}_H +\tilde{E}_{g,MgO}+\tilde{E}_{g,FeO}+\tilde{E}_{g,SiO2}$$
+	(see Nimmo 2015, eq. 72). Note that this expression does not include contributions from latent heat release from exsolution of light elements because heat produced at the CMB does not contribute to thermal convection.
+	
+	As noted in the main text, we do not allow light elements to diffuse into the core because they would form a thin stratified layer and fail to mix into the bulk core. We implement this by requiring that \(\partial_t M_i \le 0\) for i=Mg,Si,O. We do allow Fe to diffuse into the core, but this happens only rarely as a result of changing mantle composition due to mantle overturn in our models and must be matched by exsolution of light elements. Oxygen cannot diffuse into the core and therefore the O concentration cannot increase, which requires that any FeO entering the core be matched by MgO or SiO2 pulling Oxygen out at the same or faster rate.
+	
+		\bibliography{citations}
 \end{document}
