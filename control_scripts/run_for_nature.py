@@ -39,7 +39,8 @@ for T_cmb0 in T_cmbs:
 	for X_Mg_0 in X_Mgs:
 		for X_Si_0 in X_Sis:
 			for X_O_0 in X_Os:
-				print(T_cmb0, X_Si_0, X_Mg_0, X_O_0)
+				time = str(datetime.datetime.now())
+				print('{} - {} K - {} Si {} Mg {} O'.format(time, T_cmb0, X_Si_0, X_Mg_0, X_O_0))
 				pl = mg_si.planet.Custom()
 				pl.reactions._set_layer_thickness(layer_thickness)
 				pl.reactions._set_overturn_time(overturn)
@@ -74,7 +75,6 @@ for T_cmb0 in T_cmbs:
 					mplt.composition(pl, times, solution, filepath=filepath)
 					plt.close('all')
 					dill.dump((pl,times,solution), open(filepath+'data.m','wb'))
-					time = str(datetime.datetime.now())
 					r_i = pl.core_layer.r_i(solution[-1,0], one_off=True)
 					csvdata = [time, r_i, T_cmb0, X_Mg_0, X_Si_0, X_O_0, MgNumFp, MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present, deltaT0, layer_thickness, overturn]
 					with open(basefolder+'run_data{}.csv'.format(iT), 'a') as f:
@@ -87,7 +87,6 @@ for T_cmb0 in T_cmbs:
 				except:
 					try:
 						del pl
-						time = str(datetime.datetime.now())
 						r_i = 'nan'
 						csvdata = [time, r_i, T_cmb0, X_Mg_0, X_Si_0, X_O_0, MgNumFp, MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present, deltaT0, layer_thickness, overturn]
 						with open(basefolder+'run_data{}.csv'.format(iT), 'a') as f:
