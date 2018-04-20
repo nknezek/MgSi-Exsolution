@@ -46,7 +46,16 @@ for nu_present in nus :
                     pl.reactions._set_overturn_time(overturn)
                     deltaT0 = pl.mantle_layer.get_dT0(T_cmb0)
                     T_um0 = T_cmb0-deltaT0
-                    try:
+    				try:
+                        filepath = basefolder+ "Tc{:.1f}_XM{:.3f}_XS{:.3f}_XO{:.3f}_fFp{:.2f}_fPv{:.2f}_XMgFe{:.2f}_XSb{:.2f}_nu{:.0e}_lthck{:.0e}_ovt{:.0e}/".format(T_cmb0, X_Mg_0, X_Si_0, X_O_0,MgNumFp,MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present,layer_thickness,overturn)
+    					if not os.path.exists(basefolder):
+    						os.mkdir(basefolder)
+    					if os.path.exists(filepath+'data.m'):
+    						print('already computed')
+    						continue
+    					if not os.path.exists(filepath):
+    						os.mkdir(filepath)
+
                         Moles_0 = pl.reactions.compute_Moles_0(X_Mg_0, X_Si_0, X_O_0, T_cmb0)
                         x0 = [T_cmb0, T_um0]
                         x0 = x0+Moles_0
@@ -59,37 +68,36 @@ for nu_present in nus :
                         nu_old =  nu_present/1e3
                         T_old = T_um0
                         A,nu0 = pl.mantle_layer.find_arrenhius_params(nu_present, T_present, nu_old, T_old, set_values=True)
+
                         solution = pl.integrate(times, x0)
-                        filepath = basefolder+ "Tc{:.1f}_XM{:.3f}_XS{:.3f}_XO{:.3f}_fFp{:.2f}_fPv{:.2f}_XMgFe{:.2f}_XSb{:.2f}_nu{:.0e}_lthck{:.0e}_ovt{:.0e}/".format
-                        (T_cmb0, X_Mg_0, X_Si_0, X_O_0,MgNumFp,MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present,layer_thickness,overturn)
-                        if not os.path.exists(basefolder):
-                            os.mkdir(basefolder)
-                            print(basefolder)
-                        if not os.path.exists(filepath):
-                            os.mkdir(filepath)
-                            print(filepath)
-                        dill.dump((pl,times,solution), open(filepath+'data.m','wb'))
                         mplt.temperature(pl, times, solution, filepath=filepath)
                         mplt.coremoles(pl, times, solution, filepath=filepath)
                         mplt.composition(pl, times, solution, filepath=filepath)
                         plt.close('all')
+                        dill.dump((pl,times,solution), open(filepath+'data.m','wb'))
                         time = str(datetime.datetime.now())
                         r_i = pl.core_layer.r_i(solution[-1,0], one_off=True)
                         csvdata = [time, r_i, T_cmb0, X_Mg_0, X_Si_0, X_O_0, MgNumFp, MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present, deltaT0, layer_thickness, overturn]
-                        print(csvdata)
+                        # print(csvdata)
                         with open(basefolder+'run_data{}.csv'.format(iT), 'a') as f:
                             writer = csv.writer(f)
                             writer.writerow(csvdata)
                         f.close()
                         copyfile('./dynamo_power.py',filepath+'dynamo_power.py')
                         del pl
+    					del csvdata
+    					print('==== successfully finished computing')
                     except :
-                        del pl
-                        time = str(datetime.datetime.now())
-                        r_i = np.nan
-                        csvdata = [time, r_i, T_cmb0, X_Mg_0, X_Si_0, X_O_0, MgNumFp, MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present, deltaT0, layer_thickness, overturn]
-                        with open(basefolder+'run_data{}.csv'.format(iT), 'a') as f:
-                            writer = csv.writer(f)
-                            writer.writerow(csvdata)
-                        f.close()
-                    del csvdata,writer,f
+    					try:
+    						del pl
+    						time = str(datetime.datetime.now())
+    						r_i = 'nan'
+    						csvdata = [time, r_i, T_cmb0, X_Mg_0, X_Si_0, X_O_0, MgNumFp, MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present, deltaT0, layer_thickness, overturn]
+    						with open(basefolder+'run_data{}.csv'.format(iT), 'a') as f:
+    							writer = csv.writer(f)
+    							writer.writerow(csvdata)
+    						f.close()
+    						print('############## problem with '+str(csvdata)+'\n')
+    					except:
+    						print("!!!!!!!!!!!!!!!!!!!!!!!\ncouldn't do anything\n!!!!!!!!!!!!!!!!!\n")
+print('All Done ! - Yay : ',iT)
