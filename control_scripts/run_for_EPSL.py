@@ -23,16 +23,16 @@ X_SiO2_b = 0.015
 ## Mantle viscosity
 pl = mg_si.planet.Custom()
 
-T_cmbs = np.linspace(4800,6100,round((6100-4800)/100)-3)
+T_cmbs = np.linspace(4800,6100,10)
 iT = int(sys.argv[1])
 
 layer_thickness = layer_thickness_all[iT]
 overturn = overturn_all[iT]
 
 # T_cmbs = T_cmbs_all[Ntc*iT:(iT+1)*Ntc]
-X_Mgs = np.linspace(1e-5,.05,round(.05/.005)-3)
-X_Sis = np.linspace(1e-5,.1,round(.05/.005)-3)
-X_Os = np.linspace(1e-5,.25,round(.15/.005)-3)
+X_Mgs = np.linspace(1e-5,.05,7)
+X_Sis = np.linspace(1e-5,.1,7)
+X_Os = np.linspace(1e-5,.25,20)
 nus = np.array([10**19, 10**20, 10**21])/pl.params.mantle.rho #[m^2/s]
 basefolder = '../computed_solutions_epsl/'
 for nu_present in nus :
