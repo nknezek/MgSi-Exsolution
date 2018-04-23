@@ -38,12 +38,15 @@ X_Sis = np.linspace(1e-5,.05,round(.05/.005)+1)
 X_Os = np.linspace(.155,.25,20)
 
 basefolder = '../computed_solutions_nature/'
+Ntotal = len(T_cmbs)*len(X_Mgs)*len(X_Sis)*len(X_Os)
+i = 1
 for T_cmb0 in T_cmbs:
 	for X_Mg_0 in X_Mgs:
 		for X_Si_0 in X_Sis:
 			for X_O_0 in X_Os:
 				time = str(datetime.datetime.now())
-				print('{} - {} K - {} Si {} Mg {} O'.format(time, T_cmb0, X_Si_0, X_Mg_0, X_O_0))
+				print('{} - {} K - {} Si {} Mg {} O - {}/{}'.format(time, T_cmb0, X_Si_0, X_Mg_0, X_O_0,i,Ntotal))
+				i += 1
 				pl = mg_si.planet.Custom()
 				pl.reactions._set_layer_thickness(layer_thickness)
 				pl.reactions._set_overturn_time(overturn)
