@@ -479,7 +479,9 @@ class MgSi():
         return dKMgO_KMgO, dKSiO2_KSiO2, dKFeO_KFeO, dKMgSiO3_KMgSiO3, dKFeSiO3_KFeSiO3
 
     def unwrap_Moles(self, Moles, return_sum=True, split_coremantle=False):
-        ''' unwrap and compute Moles in core and mantle
+        ''' unwrap Moles to M_Mg, M_Si, M_Fe, M_O, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3 
+        if return_sum:
+        M_Mg, M_Si, M_Fe, M_O, M_c, M_MgO, M_SiO2, M_FeO, M_MgSiO3, M_FeSiO3, M_m
 
         :param Moles:
         :return:
