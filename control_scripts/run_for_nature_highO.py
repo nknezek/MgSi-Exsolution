@@ -25,7 +25,7 @@ X_SiO2_b = 0.015
 pl = mg_si.planet.Custom()
 nu_present = 10**21/pl.params.mantle.rho #[m^2/s]
 
-T_min_all = 5000
+T_min_all = 4700
 T_max_all = 6400
 T_cmbs_all = np.linspace(T_min_all,T_max_all,round((T_max_all-T_min_all)/100)+1)
 Ntc = 3
