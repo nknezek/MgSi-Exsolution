@@ -416,7 +416,7 @@ class MgSi():
         # dKFeSiO3_KFeSiO3 = pr.dKFeSiO3_KFeSiO3
         return dKFeSiO3_KFeSiO3
 
-    def func_KD_SiO2_val(self, X_Si, X_O, T_inp, P_inp_base=139e6, temp_diff_pm=10):
+    def func_KD_SiO2_val(self, X_Si, X_O, T_inp, P_inp_base=139e6, temp_diff_pm=10, ParamCitation='Hirose2017'):
         '''
         K_D for SiO2 value
         Needs the following inputs : T_inp (Temperature in K), P_inp (Pressure in GPa),
@@ -426,34 +426,55 @@ class MgSi():
         Note - (all the Mg related terms are zero since no data)
         '''
         P_inp = P_inp_base / 1e6  # convert to GPa
-        ### Fit values from Hirose et al. 2017 paper (Eqn 5 in the Supplementary material)
-        fit_KD_FeO_a = 0.3009  # (+/- 0.1120)
-        fit_KD_FeO_b = 0
-        fit_KD_FeO_c = -36.8332  # (+/- 5.5957)
-        # Fit values from Rebecca Fischer et al. 2015 (extended Data Table 1 - Hirose 2017)
-        fit_KD_Si_a = 1.3  # (+/- 0.3)
-        fit_KD_Si_b = -13500  # (+/- 900)
-        fit_KD_Si_c = 0
-        log_KD_Feo = fit_KD_FeO_a + fit_KD_FeO_b / T_inp + fit_KD_FeO_c * P_inp / T_inp
-        log_KD_Si = fit_KD_Si_a + fit_KD_Si_b / T_inp + fit_KD_Si_c * P_inp / T_inp
-        KD_SiO2_p = (10. ** log_KD_Si) * ((10. ** log_KD_Feo) ** 2.)
-        emp_corr_fac = 2.  # to match the dataset from Hirose et al. 2017
-        KD_SiO2 = KD_SiO2_p * emp_corr_fac
+        if ParamCitation == 'Hirose2017':
+            ### Fit values from Hirose et al. 2017 paper (Eqn 5 in the Supplementary material)
+            fit_KD_FeO_a = 0.3009  # (+/- 0.1120)
+            fit_KD_FeO_b = 0
+            fit_KD_FeO_c = -36.8332  # (+/- 5.5957)
+            log_KD_Feo = fit_KD_FeO_a + fit_KD_FeO_b / T_inp + fit_KD_FeO_c * P_inp / T_inp
+            # Fit values from Rebecca Fischer et al. 2015 (extended Data Table 1 - Hirose 2017)
+            fit_KD_Si_a = 1.3  # (+/- 0.3)
+            fit_KD_Si_b = -13500  # (+/- 900)
+            fit_KD_Si_c = 0
+            log_KD_Si = fit_KD_Si_a + fit_KD_Si_b / T_inp + fit_KD_Si_c * P_inp / T_inp
+            KD_SiO2_p = (10. ** log_KD_Si) * ((10. ** log_KD_Feo) ** 2.)
+            emp_corr_fac = 2.  # to match the dataset from Hirose et al. 2017
+            KD_SiO2 = KD_SiO2_p * emp_corr_fac
+        elif ParamCitation == 'Badro2015':
+            fit_KD_Si_a = 0.36  # (+/- 0.3)
+            fit_KD_Si_b = -4064  # (+/- 900)
+            fit_KD_Si_c = 0
+            log_KD_Si = fit_KD_Si_a + fit_KD_Si_b / T_inp + fit_KD_Si_c * P_inp / T_inp
+            KD_SiO2 = (10. ** log_KD_Si)
         KD_SiO2_T_deriv = -1. * np.log(10) * KD_SiO2 * (2. * fit_KD_FeO_c * P_inp + fit_KD_Si_b) / T_inp ** 2.
         ### Checked this against doing the integration numerically (with a small dT)
         return KD_SiO2, KD_SiO2_T_deriv
 
-    def func_KD_FeO_val(self, T_inp, P_inp_base=139e6):
+    def func_KD_FeO_val(self, T_inp, P_inp_base=139e6, ParamCitation='Hirose2017'):
         '''
         K_D for FeO value
         Needs the following inputs : T_inp (Temperature in K), P_inp (Pressure in GPa),
         '''
         P_inp = P_inp_base / 1e6  # convert to GPa
-        ### Fit values from Hirose et al. 2017 paper (Eqn 5 in the Supplementary material)
-        fit_KD_FeO_a = 0.3009  # (+/- 0.1120)
-        fit_KD_FeO_b = 0
-        fit_KD_FeO_c = -36.8332  # (+/- 5.5957)
-        log_KD_Feo = fit_KD_FeO_a + fit_KD_FeO_b / T_inp + fit_KD_FeO_c * P_inp / T_inp
+
+        if ParamCitation == 'Hirose2017':
+            ### Fit values from Hirose et al. 2017 paper (Eqn 5 in the Supplementary material)
+            fit_KD_FeO_a = 0.3009  # (+/- 0.1120)
+            fit_KD_FeO_b = 0
+            fit_KD_FeO_c = -36.8332  # (+/- 5.5957)
+            log_KD_Feo = fit_KD_FeO_a + fit_KD_FeO_b / T_inp + fit_KD_FeO_c * P_inp / T_inp
+        elif ParamCitation == 'Badro2015':
+            ### Fit values from Badro et al. 2015 paper (in the Supplementary material)
+            fit_KD_FeO_a = 2.74 # +/- 0.14
+            fit_KD_FeO_b = -11439 # K +/- 387
+            fit_KD_FeO_c = 0 # K/GPa
+            log_KD_Feo = fit_KD_FeO_a + fit_KD_FeO_b / T_inp + fit_KD_FeO_c * P_inp / T_inp
+        elif ParamCitation == 'Fischer2015':
+            ### Fit values from Fischer et al. 2015 paper
+            fit_KD_FeO_a = 0.60 # +/- 0.4
+            fit_KD_FeO_b = -3800 # K +/- 900
+            fit_KD_FeO_c = 22 # K/GPa +/- 14
+            log_KD_Feo = fit_KD_FeO_a + fit_KD_FeO_b / T_inp + fit_KD_FeO_c * P_inp / T_inp
         KD_FeO = 10. ** log_KD_Feo
         KD_FeO_Tderiv = (KD_FeO) * -1. * fit_KD_FeO_c * P_inp * np.log(10.) / T_inp ** 2.
         return KD_FeO, KD_FeO_Tderiv

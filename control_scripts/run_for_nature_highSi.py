@@ -56,7 +56,7 @@ for T_cmb0 in T_cmbs:
 		for X_Si_0 in X_Sis:
 			for X_O_0 in X_Os:
 				time = str(datetime.datetime.now())
-				print('{} - {} K - {} Si {} Mg {} O - {}/{}'.format(time, T_cmb0, X_Si_0, X_Mg_0, X_O_0,i,Ntotal))
+				print('{} - {:.0f}K - {:.3f}Mg {:.3f}Si {:.3f}O - {}/{}'.format(time, T_cmb0, X_Mg_0, X_Si_0, X_O_0,i,Ntotal))
 				i += 1
 				pl = mg_si.planet.Custom()
 				pl.reactions._set_layer_thickness(layer_thickness)
