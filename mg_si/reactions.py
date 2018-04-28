@@ -327,7 +327,7 @@ class MgSi():
         :return:
         '''
         M_c,_ = self.unwrap_Moles(Moles, split_coremantle=True, return_sum=False)
-        return -self.core._molmass_dict['FeO'] * dMoles[3] / np.sum(self.core.M2wt(np.array(M_c)))
+        return -self.core._molmass_dict['FeO'] * dMoles[2] / np.sum(self.core.M2wt(np.array(M_c)))
 
     def _set_overturn_time(self, overturn_present):
         ''' sets the mantle overturn time function given overturn time at present [Myrs]
