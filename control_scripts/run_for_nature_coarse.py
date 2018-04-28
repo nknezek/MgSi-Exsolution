@@ -48,7 +48,7 @@ X_Mgs = np.linspace(minMg,maxMg, round((maxMg-minMg)/dMg)+1)
 X_Sis = np.linspace(minSi, maxSi, round((maxSi-minSi)/dSi)+1)
 X_Os = np.linspace(minO, maxO, round((maxO-minO)/dO)+1)
 
-basefolder = '/media/nknezek/compute_storage/computed_solutions_Fischer2015/'
+basefolder = '/media/nknezek/compute_storage/computed_solutions_nature/'
 Ntotal = len(T_cmbs)*len(X_Mgs)*len(X_Sis)*len(X_Os)
 i = 1
 for T_cmb0 in T_cmbs:
@@ -72,9 +72,6 @@ for T_cmb0 in T_cmbs:
 						continue
 					if not os.path.exists(filepath):
 						os.mkdir(filepath)
-					pl.params.reactions.ParamCitationFeO = 'Fischer2015'
-					pl.params.reactions.ParamCitationSiO2 = 'Fischer2015'
-					pl.params.reactions.ParamCitationMgO = 'Badro2015'
 
 					Moles_0 = pl.reactions.compute_Moles_0(X_Mg_0, X_Si_0, X_O_0, T_cmb0)
 					x0 = [T_cmb0, T_um0]
