@@ -37,11 +37,11 @@ minMg = 1e-5
 maxMg = .05
 
 dO = .01
-minO = .10
-maxO = .25
+minO = .05
+maxO = .20
 
 dSi = .01
-minSi = .10
+minSi = .05
 maxSi = .15
 
 X_Mgs = np.linspace(minMg,maxMg, round((maxMg-minMg)/dMg)+1)

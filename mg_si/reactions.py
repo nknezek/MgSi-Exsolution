@@ -310,7 +310,7 @@ class MgSi():
         return -self.core._molmass_dict['MgO']*dMoles[0]/np.sum(self.core.M2wt(np.array(M_c)))
 
     def C_s(self, dMoles, Moles):
-        ''' compute wt % MgO exsolved from the core given dM and M
+        ''' compute wt % SiO2 exsolved from the core given dM and M
 
         :param dM:
         :param M:
@@ -320,14 +320,15 @@ class MgSi():
         return -self.core._molmass_dict['SiO2'] * dMoles[1] / np.sum(self.core.M2wt(np.array(M_c)))
 
     def C_f(self, dMoles, Moles):
-        ''' compute wt % MgO exsolved from the core given dM and M
+        ''' compute wt % Feo exsolved from the core given dM and M
 
         :param dM:
         :param M:
         :return:
         '''
         M_c,_ = self.unwrap_Moles(Moles, split_coremantle=True, return_sum=False)
-        return -self.core._molmass_dict['FeO'] * dMoles[2] / np.sum(self.core.M2wt(np.array(M_c)))
+        C_f_raw = -self.core._molmass_dict['FeO'] * dMoles[2] / np.sum(self.core.M2wt(np.array(M_c)))
+        return min(0,C_f_raw)
 
     def _set_overturn_time(self, overturn_present):
         ''' sets the mantle overturn time function given overturn time at present [Myrs]
