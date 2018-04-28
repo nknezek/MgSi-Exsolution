@@ -9,6 +9,8 @@ import csv
 import datetime
 
 from mg_si import plot as mplt
+r_i_real = 1220e3
+
 
 print(sys.argv)
 layer_thickness = 100 # m
@@ -37,11 +39,11 @@ minMg = 1e-5
 maxMg = .05
 
 dO = .01
-minO = .05
+minO = 1e-5
 maxO = .20
 
 dSi = .01
-minSi = .05
+minSi = 1e-5
 maxSi = .15
 
 X_Mgs = np.linspace(minMg,maxMg, round((maxMg-minMg)/dMg)+1)
@@ -86,6 +88,7 @@ for T_cmb0 in T_cmbs:
 					T_old = T_um0
 					A,nu0 = pl.mantle_layer.find_arrenhius_params(nu_present, T_present, nu_old, T_old, set_values=True)
 
+					# plot and store solution info
 					solution = pl.integrate(times, x0)
 					mplt.temperature(pl, times, solution, filepath=filepath)
 					mplt.coremoles(pl, times, solution, filepath=filepath)
@@ -93,11 +96,21 @@ for T_cmb0 in T_cmbs:
 					plt.close('all')
 					dill.dump((pl,times,solution), open(filepath+'data.m','wb'))
 					r_i = pl.core_layer.r_i(solution[-1,0], one_off=True)
+					
+					# Store Run Info into csv file
 					csvdata = [time, r_i, T_cmb0, X_Mg_0, X_Si_0, X_O_0, MgNumFp, MgNumPv, X_MgFeO_b, X_SiO2_b, nu_present, deltaT0, layer_thickness, overturn]
 					with open(basefolder+'run_data{}.csv'.format(iT), 'a') as f:
 						writer = csv.writer(f)
 						writer.writerow(csvdata)
 					f.close()
+
+					# if the inner-core size is within 10% of real inner-core, compute entropy and heat terms
+					if np.abs(r_i/r_i_real-1)<.1:
+						t_N, all_parameters = pl.core_layer.compute_all_parameters(times, solution)
+						mplt.Q_all(pl, t_N, all_parameters, filepath=datafolder+foldername)
+						mplt.E_all(pl, t_N, all_parameters, filepath=datafolder+foldername)
+						dill.dump((t_N,all_parameters), open(datafolder+foldername+alldatafile,'wb'))
+						plt.close('all')
 					del pl
 					del csvdata
 					print('==== successfully finished computing')
