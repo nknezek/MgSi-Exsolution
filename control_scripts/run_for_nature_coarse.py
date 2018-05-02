@@ -51,6 +51,8 @@ X_Sis = np.linspace(minSi, maxSi, round((maxSi-minSi)/dSi)+1)
 X_Os = np.linspace(minO, maxO, round((maxO-minO)/dO)+1)
 
 basefolder = '/media/nknezek/compute_storage/computed_solutions_nature/'
+alldatafile = 'all_parameters.m'
+
 Ntotal = len(T_cmbs)*len(X_Mgs)*len(X_Sis)*len(X_Os)
 i = 1
 for T_cmb0 in T_cmbs:
@@ -74,7 +76,7 @@ for T_cmb0 in T_cmbs:
 						continue
 					if not os.path.exists(filepath):
 						os.mkdir(filepath)
-
+							
 					Moles_0 = pl.reactions.compute_Moles_0(X_Mg_0, X_Si_0, X_O_0, T_cmb0)
 					x0 = [T_cmb0, T_um0]
 					x0 = x0+Moles_0
@@ -106,10 +108,11 @@ for T_cmb0 in T_cmbs:
 
 					# if the inner-core size is within 10% of real inner-core, compute entropy and heat terms
 					if np.abs(r_i/r_i_real-1)<.1:
+						print('r_i within 10%, computing and storing entropy history')
 						t_N, all_parameters = pl.core_layer.compute_all_parameters(times, solution)
-						mplt.Q_all(pl, t_N, all_parameters, filepath=datafolder+foldername)
-						mplt.E_all(pl, t_N, all_parameters, filepath=datafolder+foldername)
-						dill.dump((t_N,all_parameters), open(datafolder+foldername+alldatafile,'wb'))
+						mplt.Q_all(pl, t_N, all_parameters, filepath=filepath)
+						mplt.E_all(pl, t_N, all_parameters, filepath=filepath)
+						dill.dump((t_N,all_parameters), open(filepath+alldatafile,'wb'))
 						plt.close('all')
 					del pl
 					del csvdata
