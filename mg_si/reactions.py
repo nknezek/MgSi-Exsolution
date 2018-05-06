@@ -211,12 +211,32 @@ class Molar_Calculations():
         '''
         return M_tot * np.sum(wtp) / np.sum(wtp / self.molmass)
 
+class Core_All(Molar_Calculations):
+    '''class to compute molar concentrations in core for Mg + Si exsolution
+
+        extends Molar_Calculations
+        '''
+
+    def __init__(self, params=None, species=None):
+        if params is None:
+            params = Parameters('dummy parent parameters')
+            params.reactions = Parameters('dummy parent parameters')
+        self.params = params
+        if species is None:
+            species = ['Mg', 'Si', 'Fe', 'O', 'C','Ni','H','S']
+        self.params.reactions.core = Parameters('Core reaction parameters')
+        self.params.reactions.core.species = species
+        super(Core_All, self).__init__(species=species)
+
 class Core_MgSi(Molar_Calculations):
     '''class to compute molar concentrations in core for Mg + Si exsolution
 
     extends Molar_Calculations
     '''
     def __init__(self, params=None, species=None):
+        if params is None:
+            params = Parameters('dummy parameters struct')
+            params.reactions = Parameters('dummy parameters struct')
         self.params = params
         if species is None:
             species = ['Mg','Si','Fe','O']
