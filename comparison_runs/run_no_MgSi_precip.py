@@ -46,7 +46,7 @@ X_Mgs = [0.010]
 X_Sis = [0.120]
 X_Os = [0.080]
 
-basefolder = '/Users/nknezek/code/MgSi-Exsolution/computed_solutions/no_MgSi_precip/'
+basefolder = '/Users/nknezek/code/MgSi-Exsolution/comparison_runs/no_MgSi_precip/'
 alldatafile = 'new_parameters.m'
 
 Ntotal = len(X_Mgs)*len(X_Sis)*len(X_Os)
@@ -91,7 +91,7 @@ for X_Mg_0 in X_Mgs:
                 pl.params.reactions.ParamCitationFeO = 'Fischer2015'
                 
                 pl.params.reactions.ParamCitationSiO2 = 'from_params'
-                pl.params.reactions.fit_KD_Si_a = 1.
+                pl.params.reactions.fit_KD_Si_a = 0.5
                 pl.params.reactions.fit_KD_Si_b = 0.
                 pl.params.reactions.fit_KD_Si_c = 0.
                 

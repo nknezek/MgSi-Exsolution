@@ -46,7 +46,7 @@ X_Mgs = [0.010]
 X_Sis = [0.120]
 X_Os = [0.080]
 
-basefolder = '/Users/nknezek/code/MgSi-Exsolution/computed_solutions/no_Si_precip/'
+basefolder = '/Users/nknezek/code/MgSi-Exsolution/comparison_runs/no_Si_precip/'
 alldatafile = 'new_parameters.m'
 
 Ntotal = len(X_Mgs)*len(X_Sis)*len(X_Os)

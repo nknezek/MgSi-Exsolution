@@ -46,7 +46,7 @@ X_Mgs = [0.010]
 X_Sis = [0.120]
 X_Os = [0.080]
 
-basefolder = '/Users/nknezek/code/MgSi-Exsolution/computed_solutions/no_mantle_overturn/'
+basefolder = '/Users/nknezek/code/MgSi-Exsolution/comparison_runs/no_mantle_overturn/'
 alldatafile = 'new_parameters.m'
 
 Ntotal = len(X_Mgs)*len(X_Sis)*len(X_Os)
