@@ -377,10 +377,28 @@ class Custom(Stevenson):
         pm = self.params.mantle
         return self.planet.radiogenics.heat_production_mantle(pm.Hp, time)/self.volume
 
-    def get_dT0(self, T_cmb0):
+    def get_dT0(self, T_cmb0, nu_present=None, tau=None, H=None):
         m = 0.41431452
         b = 182.04637097
-        return T_cmb0 * m + b
+        tau0 = 600
+        H0 = 100
+        dTout = T_cmb0*m+b
+
+        # if nu_present is not None:
+        #     if np.log10(nu_present * self.params.mantle.rho) > 21.09:
+        #         nu_adjust = 1.2
+        #         dTout = (T_cmb0 * m + b)*nu_adjust
+        #     else:
+        #         dTout = T_cmb0*m+b
+        # else:
+        #     dTout = T_cmb0*m+b
+        # if tau is not None:
+        #     if tau < tau0*0.99:
+        #         dTout = dTout*1.2
+        # if H is not None:
+        #     if H > H0*.99:
+        #         dTout = dTout*1.2
+        return dTout
 
     def get_Tum0(self, T_cmb0):
         return T_cmb0 - self.get_dT0(T_cmb0)

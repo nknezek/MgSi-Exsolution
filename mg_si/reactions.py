@@ -481,6 +481,13 @@ class MgSi():
             log_KD_Si = fit_KD_Si_a + fit_KD_Si_b / T_inp + fit_KD_Si_c * P_inp / T_inp
             KD_SiO2 = 10**log_KD_Si
             KD_SiO2_T_deriv = (KD_SiO2) * -1. * fit_KD_Si_c * P_inp * np.log(10.) / T_inp ** 2.
+        elif ParamCitation == 'from_params':
+            fit_KD_Si_a = pr.fit_KD_Si_a  #
+            fit_KD_Si_b = pr.fit_KD_Si_b # K
+            fit_KD_Si_c = pr.fit_KD_Si_c  # K/GPa
+            log_KD_Si = fit_KD_Si_a + fit_KD_Si_b / T_inp + fit_KD_Si_c * P_inp / T_inp
+            KD_SiO2 = 10**log_KD_Si
+            KD_SiO2_T_deriv = (KD_SiO2) * -1. * fit_KD_Si_c * P_inp * np.log(10.) / T_inp ** 2.
         else:
             raise ValueError('ParamCitation for SiO2 unknown')
         ### Checked this against doing the integration numerically (with a small dT)
@@ -517,6 +524,11 @@ class MgSi():
             fit_KD_FeO_b = -3800  # K (+/- 900)
             fit_KD_FeO_c = 22 # K/GPa (+/- 14)
             log_KD_Feo = fit_KD_FeO_a + fit_KD_FeO_b / T_inp + fit_KD_FeO_c * P_inp / T_inp
+        elif ParamCitation == 'from_params':
+            fit_KD_FeO_a = pr.fit_KD_FeO_a  #
+            fit_KD_FeO_b = pr.fit_KD_FeO_b # K
+            fit_KD_FeO_c = pr.fit_KD_FeO_c  # K/GPa
+            log_KD_FeO = fit_KD_FeO_a + fit_KD_FeO_b / T_inp + fit_KD_FeO_c * P_inp / T_inp
         else:
             raise ValueError('ParamCitation for FeO unknown')
         KD_FeO = 10. ** log_KD_Feo
@@ -541,6 +553,11 @@ class MgSi():
             fit_KD_MgO_b = -18816  # (+/- 2600)
             fit_KD_MgO_c = 0
             log_KD_Mgo = fit_KD_MgO_a + fit_KD_MgO_b / T_inp + fit_KD_MgO_c * P_inp / T_inp
+        elif ParamCitation == 'from_params':
+            fit_KD_MgO_a = pr.fit_KD_MgO_a  #
+            fit_KD_MgO_b = pr.fit_KD_MgO_b  # K
+            fit_KD_MgO_c = pr.fit_KD_MgO_c  # K/GPa
+            log_KD_MgO = fit_KD_MgO_a + fit_KD_MgO_b / T_inp + fit_KD_MgO_c * P_inp / T_inp
         else:
             raise ValueError('ParamCitation for MgO unknown')
         KD_MgO = 10. ** log_KD_Mgo
