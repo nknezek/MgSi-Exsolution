@@ -27,7 +27,7 @@ class timeout:
 r_i_real = 1220e3
 
 layer_thickness = 100 # m
-overturn = 0. # Myr
+overturn = 600 # Myr
 times = np.linspace(0,4568e6*365.25*24*3600,40000)
 
 ## background mantle state
@@ -46,7 +46,7 @@ X_Mgs = [0.010]
 X_Sis = [0.120]
 X_Os = [0.080]
 
-basefolder = '/media/nknezek/compute_storage/no_precip_comparison/'
+basefolder = '/Users/nknezek/code/MgSi-Exsolution/computed_solutions/no_MgSi_precip/'
 alldatafile = 'new_parameters.m'
 
 Ntotal = len(X_Mgs)*len(X_Sis)*len(X_Os)
@@ -89,8 +89,17 @@ for X_Mg_0 in X_Mgs:
                 continue
             try:
                 pl.params.reactions.ParamCitationFeO = 'Fischer2015'
-                pl.params.reactions.ParamCitationSiO2 = 'Fischer2015'
-                pl.params.reactions.ParamCitationMgO = 'Badro2015'
+                
+                pl.params.reactions.ParamCitationSiO2 = 'from_params'
+                pl.params.reactions.fit_KD_Si_a = 1.
+                pl.params.reactions.fit_KD_Si_b = 0.
+                pl.params.reactions.fit_KD_Si_c = 0.
+                
+                pl.params.reactions.ParamCitationMgO = 'from_params'
+                pl.params.reactions.fit_KD_MgO_a = 1.
+                pl.params.reactions.fit_KD_MgO_b = 0.
+                pl.params.reactions.fit_KD_MgO_c = 0.
+
 
                 Moles_0 = pl.reactions.compute_Moles_0(X_Mg_0, X_Si_0, X_O_0, T_cmb0)
                 x0 = [T_cmb0, T_um0]
@@ -137,13 +146,14 @@ for X_Mg_0 in X_Mgs:
                 continue
             try:
                 # if the inner-core size is within 10% of real inner-core, compute entropy and heat terms
+            # if the inner-core size is within 10% of real inner-core, compute entropy and heat terms
+                t_N, all_parameters = pl.core_layer.compute_all_parameters(times, solution)
+            #             mplt.Q_all(pl, t_N, all_parameters, filepath=filepath)
+                mplt.E_all(pl, t_N, all_parameters, filepath=filepath)
+                dill.dump((t_N, all_parameters), open(filepath+alldatafile,'wb'))
+                plt.close('all')
                 if np.abs(r_i/r_i_real-1)<.1:
                     print('r_i {:.0f} km within 10%, computing and storing entropy history'.format(r_i/1e3))
-                    t_N, all_parameters = pl.core_layer.compute_all_parameters(times, solution)
-            #             mplt.Q_all(pl, t_N, all_parameters, filepath=filepath)
-                    mplt.E_all(pl, t_N, all_parameters, filepath=filepath)
-                    dill.dump((t_N, all_parameters), open(filepath+alldatafile,'wb'))
-                    plt.close('all')
                 else:
                     print('r_i {:.0f} km not within 10%, entropies not computed'.format(r_i/1e3))
                 del pl
