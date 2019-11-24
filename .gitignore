@@ -2,6 +2,15 @@
 computed_solutions_nature/T*
 .idea
 
+# images
+*.png
+*.pdf
+*.jpg
+
+# data files
+data/*
+*.gz
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
